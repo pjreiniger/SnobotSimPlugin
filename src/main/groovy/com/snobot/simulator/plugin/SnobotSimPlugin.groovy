@@ -15,7 +15,7 @@ class SnobotSimPlugin implements Plugin<Project> {
         }
         
         
-        def snobotSimVersion = "0.3"
+        def snobotSimVersion = "0.4"
         def jfreecommon = "1.0.16"
         def jfreechart = "1.0.13"
         def log4j = "1.2.16"
