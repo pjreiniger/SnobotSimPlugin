@@ -22,7 +22,7 @@ dependencies {
     testCompile gradleTestKit()
 }
 
-archivesBaseName = "SnobotSimPlugin"
+archivesBaseName = "SnobotSimulatorPlugin"
 
 publishing {
     repositories {
