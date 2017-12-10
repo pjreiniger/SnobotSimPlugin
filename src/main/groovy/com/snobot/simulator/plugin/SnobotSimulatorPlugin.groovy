@@ -6,7 +6,7 @@ import org.gradle.api.Task
 import org.gradle.internal.os.OperatingSystem
 
 
-class SnobotSimPlugin implements Plugin<Project> {
+class SnobotSimulatorPlugin implements Plugin<Project> {
     void apply(Project project) {
     
         project.repositories.maven { repo ->
@@ -78,30 +78,6 @@ class SnobotSimPlugin implements Plugin<Project> {
                     print it + " "
                 }
                 println ""
-
-
-                
-                //println args
-                //println "DDDDDDDD"
-                
-                //def config = project.configurations.getByName("wpiTools")
-                //Set<File> jarfiles = config.files(config.dependencies.find { d -> d.name == "SmartDashboard" })
-                //ProcessBuilder builder
-                //if (OperatingSystem.current().isWindows()) {
-                //    builder = new ProcessBuilder(
-                //        "cmd", "/c", "start",
-                //        "java", "-jar", "${jarfiles.first().absolutePath}".toString()
-                //    )
-                //} else {
-                //    builder = new ProcessBuilder(
-                //        Jvm.current().getExecutable("java").absolutePath,
-                //        "-jar",
-                //        jarfiles.first().absolutePath
-                //    )
-                //}
-                //
-                //builder.directory(smartDashboardDirectory())
-                //builder.start()
             }
         }
     }
