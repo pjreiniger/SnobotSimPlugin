@@ -4,6 +4,48 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task
 import org.gradle.internal.os.OperatingSystem
+import groovy.transform.CompileStatic
+
+@CompileStatic
+class SnobotSimulatorVersionsExtension {
+
+    String snobotSimVersion = "0.4"
+    String jfreecommon = "1.0.16"
+    String jfreechart = "1.0.13"
+    String log4j = "1.2.16"
+    String snakeyaml = "1.18"
+    String miglayout = "4.2"
+    String ntcore = "+"
+    String cscore = "+"
+    String opencv = "+"
+
+    final Project project
+
+    SnobotSimulatorVersionsExtension(Project project) {
+        this.project = project
+        
+        def versions = this.versions()
+        //def versions = new JsonSlurper().parseText(versions_str)[year] as Map
+        this.versions().forEach { String property, String v ->
+            this.setProperty(property, (versions as Map)[v] ?: this.getProperty(property))
+        }
+    }
+      
+    Map<String, String> versions() {
+        return [
+            "snobotSimVersion" : snobotSimVersion,
+            "jfreecommon" : jfreecommon,
+            "jfreechart" : jfreechart,
+            "log4j" : log4j,
+            "snakeyaml" : snakeyaml,
+            "miglayout" : miglayout,
+            "ntcore" : ntcore,
+            "cscore" : cscore,
+            "opencv" : opencv,
+            ]
+    }
+}
+
 
 
 class SnobotSimulatorPlugin implements Plugin<Project> {
@@ -15,45 +57,34 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
         }
         
         
-        def snobotSimVersion = "0.4"
-        def jfreecommon = "1.0.16"
-        def jfreechart = "1.0.13"
-        def log4j = "1.2.16"
-        def snakeyaml = "1.18"
-        def miglayout = "4.2"
-        def ntcore = "+"
-        def cscore = "+"
-        def opencv = "+"
         
-        project.configurations.maybeCreate("snobotSimLibs")
-        project.dependencies.add("snobotSimLibs", "com.snobot.simulator:snobot_sim_gui:${snobotSimVersion}:all")
-        project.dependencies.add("snobotSimLibs", "jfree:jcommon:${jfreecommon}")
-        project.dependencies.add("snobotSimLibs", "jfree:jfreechart:${jfreechart}")
-        project.dependencies.add("snobotSimLibs", "log4j:log4j:${log4j}")
-        project.dependencies.add("snobotSimLibs", "org.yaml:snakeyaml:${snakeyaml}")
-        project.dependencies.add("snobotSimLibs", "com.miglayout:miglayout-swing:${miglayout}")
-        project.dependencies.add("snobotSimLibs", "com.miglayout:miglayout-core:${miglayout}")
-        project.dependencies.add("snobotSimLibs", "edu.wpi.first.ntcore:ntcore-jni:${ntcore}:all")
-        project.dependencies.add("snobotSimLibs", "edu.wpi.first.cscore:cscore-jni:${cscore}:all")
-        project.dependencies.add("snobotSimLibs", "org.opencv:opencv-jni:${opencv}:all")
-        project.dependencies.add("snobotSimLibs", "net.java.jinput:jinput:2.0.7")
-        project.dependencies.add("snobotSimLibs", "net.java.jutils:jutils:1.0.0")
+        def snobotSimVersionExt = project.extensions.create("snobotSimVersions", SnobotSimulatorVersionsExtension, project)
         
-        if (OperatingSystem.current().isWindows()) 
-        {
-            project.dependencies.add("snobotSimLibs", "com.snobot.simulator:snobot_sim_java:${snobotSimVersion}:uber_native-windows")
-        }
-        else 
-        {
-            project.dependencies.add("snobotSimLibs", "com.snobot.simulator:snobot_sim_java:${snobotSimVersion}:uber_native-linux")
+        project.task("snobotSimVersions") { Task task ->
+            task.group = "SnobotSimulator"
+            task.description = "Print all versions of the snobotSim block"
+            task.doLast {
+                snobotSimVersionExt.versions().each { String key, String v ->
+                    println "${v} (${key})"
+                }
+            }
         }
 
         // Configuration for pulling in everything needed for SnobotSim
         project.dependencies.ext.snobotSimCompile = {
             def l = [
-                project.configurations.getByName("snobotSimLibs").dependencies.each {
-                    it
-                }
+                "com.snobot.simulator:snobot_sim_gui:${snobotSimVersionExt.snobotSimVersion}:all",
+                "jfree:jcommon:${snobotSimVersionExt.jfreecommon}",
+                "jfree:jfreechart:${snobotSimVersionExt.jfreechart}",
+                "log4j:log4j:${snobotSimVersionExt.log4j}",
+                "org.yaml:snakeyaml:${snobotSimVersionExt.snakeyaml}",
+                "com.miglayout:miglayout-swing:${snobotSimVersionExt.miglayout}",
+                "com.miglayout:miglayout-core:${snobotSimVersionExt.miglayout}",
+                "edu.wpi.first.ntcore:ntcore-jni:${snobotSimVersionExt.ntcore}:all",
+                "edu.wpi.first.cscore:cscore-jni:${snobotSimVersionExt.cscore}:all",
+                "org.opencv:opencv-jni:${snobotSimVersionExt.opencv}:all",
+                "net.java.jinput:jinput:2.0.7",
+                "net.java.jutils:jutils:1.0.0",
             ]
 
             l
