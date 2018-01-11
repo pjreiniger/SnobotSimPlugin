@@ -8,6 +8,7 @@ plugins {
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
+apply plugin: "com.gradle.plugin-publish"
 
 repositories {
     maven {
@@ -40,7 +41,7 @@ publishing {
 
 
 group = "com.snobot.simulator.plugin"
-version = "2018.01.01"
+version = "2018.01.10"
 
 pluginBundle {
     website = 'https://github.com/pjreiniger/SnobotSimPlugin'
@@ -54,8 +55,4 @@ pluginBundle {
             displayName = 'Snobot Simulator Plugin'
         }
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
 }
