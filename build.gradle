@@ -41,7 +41,7 @@ publishing {
 
 
 group = "com.snobot.simulator.plugin"
-version = "2018.01.10"
+version = "2018.05.02"
 
 pluginBundle {
     website = 'https://github.com/pjreiniger/SnobotSimPlugin'

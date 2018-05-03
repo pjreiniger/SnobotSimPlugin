@@ -10,10 +10,10 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SnobotSimulatorVersionsExtension {
 
-    String snobotSimVersion = "0.7.1"
+    String snobotSimVersion = "dev-2019-0.0.0"
     String jfreecommon = "1.0.16"
     String jfreechart = "1.0.13"
-    String log4j = "1.2.16"
+    String log4j = "2.11.0"
     String snakeyaml = "1.18"
     String miglayout = "4.2"
     String ntcore = "+"
@@ -50,6 +50,23 @@ class SnobotSimulatorVersionsExtension {
 
 
 class SnobotSimulatorPlugin implements Plugin<Project> {
+
+    String getOsName()
+    {
+        
+        def os_name = ""
+        if (OperatingSystem.current().isWindows()) 
+        {
+            os_name = "windows"
+        }
+        else
+        {
+            os_name = "linux"
+        }
+        
+        return os_name;
+    }
+
     void apply(Project project) {
     
         project.repositories.maven { repo ->
@@ -61,16 +78,12 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
             repo.name = "PublishedMaven"
             repo.url = "https://plugins.gradle.org/m2/"
         }
+    
+        project.repositories {
+            mavenLocal()
+        }
         
-        def os_name = ""
-        if (OperatingSystem.current().isWindows()) 
-        {
-            os_name = "windows"
-        }
-        else
-        {
-            os_name = "linux"
-        }
+        def os_name = getOsName()
         
         
         def snobotSimVersionExt = project.extensions.create("snobotSimVersions", SnobotSimulatorVersionsExtension, project)
@@ -120,10 +133,25 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
         // Configuration for pulling in everything needed for SnobotSim
         project.dependencies.ext.snobotSimCompile = {
             def l = [
-                "com.snobot.simulator:snobot_sim_gui:${snobotSimVersionExt.snobotSimVersion}:all",
+                "com.snobot.simulator:snobot_sim_gui:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:snobot_sim_java:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:snobot_sim_utilites:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:ctre_override:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:ctre_override:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:temp_hal_sim:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:temp_hal_sim:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}",
+                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:wpilib:${snobotSimVersionExt.snobotSimVersion}:wpi_native-windows",
+                
                 "jfree:jcommon:${snobotSimVersionExt.jfreecommon}",
                 "jfree:jfreechart:${snobotSimVersionExt.jfreechart}",
-                "log4j:log4j:${snobotSimVersionExt.log4j}",
+                "org.apache.logging.log4j:log4j-api:${snobotSimVersionExt.log4j}",
+                "org.apache.logging.log4j:log4j-core:${snobotSimVersionExt.log4j}",
                 "org.yaml:snakeyaml:${snobotSimVersionExt.snakeyaml}",
                 "com.miglayout:miglayout-swing:${snobotSimVersionExt.miglayout}",
                 "com.miglayout:miglayout-core:${snobotSimVersionExt.miglayout}",
@@ -132,7 +160,7 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
                 "net.java.jutils:jutils:1.0.0",
             ]
             
-            l += "com.snobot.simulator:snobot_sim_java:${snobotSimVersionExt.snobotSimVersion}:uber_native-" + os_name
+            //l += "com.snobot.simulator:snobot_sim_java:${snobotSimVersionExt.snobotSimVersion}:uber_native-" + os_name
 
             l
         }
@@ -179,6 +207,10 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
                     provider.asNode().findAll { it.@path.contains("jinput") && !it.@path.contains("natives") }.each {
                             def container = it
                             container.appendNode('attributes').appendNode('attribute', [name: 'org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY', value:project.name + "/build/native_libs"])
+                    }
+                    provider.asNode().findAll { it.@path.contains("ctre_override") && !it.@path.contains("natives") }.each {
+                            def container = it
+                            container.appendNode('attributes').appendNode('attribute', [name: 'org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY', value:project.name + "/build/native_libs/" + getOsName() + "/x86-64"])
                     }
                 }
             }
