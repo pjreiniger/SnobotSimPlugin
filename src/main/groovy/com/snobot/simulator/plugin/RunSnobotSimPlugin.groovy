@@ -53,12 +53,8 @@ class RunSnobotSimPlugin implements Plugin<Project> {
     private String addToClasspath(def configurationType, def classpath) {
         configurationType.dependencies.each {
             def the_dep = configurationType.files(it)
-            if (!the_dep.isEmpty()) {
-                classpath += the_dep.first().toString() + ";"
-                println "  " + the_dep.first().toString() + ";"
-            }
-            else {
-                println "  UH OH: " + it.toString()
+            the_dep.each { depChild ->
+                classpath += depChild.toString() + ";"
             }
         }
 

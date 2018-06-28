@@ -59,8 +59,6 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
             task.description = "Unzips any CTRE native libraries"
 
             project.configurations.ctreNativeDeps.each { Object zipFile ->
-                println "CTRE"
-                println zipFile
                 project.copy {
                     includeEmptyDirs = false
                     from project.zipTree(zipFile)
@@ -90,7 +88,6 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
             task.description = "Unzips any 3rd Party native libraries"
 
             project.configurations.native3rdPartyDeps.each { Object zipFile ->
-                println zipFile
                 project.copy {
                     includeEmptyDirs = false
                     from project.zipTree(zipFile)
@@ -111,14 +108,14 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
                 "com.snobot.simulator:snobot_sim_java:${snobotSimVersionExt.snobotSimVersion}",
                 "com.snobot.simulator:snobot_sim_utilities:${snobotSimVersionExt.snobotSimVersion}",
                 "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}",
-                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}:all",
                 "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}",
-                "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}:all",
                 "com.snobot.simulator:wpilib:${snobotSimVersionExt.snobotSimVersion}:all",
                 "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}",
                 "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}:native-all",
                 "com.snobot.simulator:temp_hal_interface:${snobotSimVersionExt.snobotSimVersion}",
-                "com.snobot.simulator:temp_hal_interface:${snobotSimVersionExt.snobotSimVersion}:native-windows",
+                "com.snobot.simulator:temp_hal_interface:${snobotSimVersionExt.snobotSimVersion}:all",
                 "jfree:jcommon:${snobotSimVersionExt.jfreecommon}",
                 "jfree:jfreechart:${snobotSimVersionExt.jfreechart}",
                 "org.apache.logging.log4j:log4j-api:${snobotSimVersionExt.log4j}",
