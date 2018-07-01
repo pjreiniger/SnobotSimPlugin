@@ -3,12 +3,32 @@ package com.snobot.simulator.plugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.file.CopySpec
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Copy;
+import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.internal.os.OperatingSystem
 
 class SnobotSimSetupPlugin implements Plugin<Project> {
 
     void apply(Project project) {
+
+        def nativeclassifier = (
+                OperatingSystem.current().isWindows() ?
+                System.getProperty("os.arch") == 'amd64' ? 'windowsx86-64' : 'windowsx86' :
+                OperatingSystem.current().isMacOsX() ? "osxx86-64" :
+                OperatingSystem.current().isLinux() ? "linuxx86-64" :
+                null
+                )
+
+        def nativeSnobotSimClassifier = (
+                OperatingSystem.current().isWindows() ?
+                System.getProperty("os.arch") == 'amd64' ? 'windows-x86-64' : 'windows-x86' :
+                OperatingSystem.current().isMacOsX() ? "os x" :
+                OperatingSystem.current().isLinux() ? "linux" :
+                null
+                )
 
         project.repositories.maven { repo ->
             repo.name = "SnobotSim"
@@ -21,8 +41,6 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
         }
 
         project.repositories { mavenLocal() }
-
-        def os_name = getOsName()
 
 
         def snobotSimVersionExt = project.extensions.create("snobotSimVersions", SnobotSimulatorVersionsExtension, project)
@@ -50,54 +68,46 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
         project.dependencies
         {
             native3rdPartyDeps "net.java.jinput:jinput:2.0.7"
-            ctreNativeDeps "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}:native-all"
-        }
 
-        // Need to only unzip the platform specific one
-        project.task("snobotSimUnzipCtreNativeTools", type: Copy, dependsOn: project.configurations.ctreNativeDeps) { Task task ->
-            task.group = "SnobotSimulator"
-            task.description = "Unzips any CTRE native libraries"
+            native3rdPartyDeps "edu.wpi.first.wpiutil:wpiutil-cpp:${snobotSimVersionExt.wpiutil}:${nativeclassifier}@zip"
+            native3rdPartyDeps "edu.wpi.first.hal:hal:${snobotSimVersionExt.wpilib}:${nativeclassifier}@zip"
+            native3rdPartyDeps "edu.wpi.first.halsim:halsim-adx_gyro_accelerometer:${snobotSimVersionExt.wpilib}:${nativeclassifier}@zip"
+            native3rdPartyDeps "edu.wpi.first.wpilibj:wpilibj-jniShared:${snobotSimVersionExt.wpilib}:${nativeclassifier}"
 
-            project.configurations.ctreNativeDeps.each { Object zipFile ->
-                project.copy {
-                    includeEmptyDirs = false
-                    from project.zipTree(zipFile)
-                    into "build/native_libs"
-                    include "**/*.dll"
-                    include "**/*.lib"
-                    include "**/*.pdb"
-                    include "**/*.so*"
-                    include "**/*.a"
-                    include "**/*.dylib"
-
-                    eachFile {
-
-                        if(!it.getRelativePath().toString().contains(os_name)) {
-                            it.exclude()
-                        }
-
-                        it.setPath(it.getRelativePath().toString().replace(os_name + "/x86-64", ""))
-                        it.setPath(it.getRelativePath().toString().replace(os_name + "/x86", ""))
-                    }
-                }
-            }
+            native3rdPartyDeps "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
+            native3rdPartyDeps "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
+            native3rdPartyDeps "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
+            native3rdPartyDeps "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
+            native3rdPartyDeps "com.snobot.simulator:temp_hal_interface:${snobotSimVersionExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
         }
 
         project.task("snobotSimUnzipNativeTools", type: Copy, dependsOn: project.configurations.native3rdPartyDeps) { Task task ->
             task.group = "SnobotSimulator"
             task.description = "Unzips any 3rd Party native libraries"
 
-            project.configurations.native3rdPartyDeps.each { Object zipFile ->
-                project.copy {
-                    includeEmptyDirs = false
-                    from project.zipTree(zipFile)
-                    into "build/native_libs"
-                    include "**/*.dll"
-                    include "**/*.lib"
-                    include "**/*.pdb"
-                    include "**/*.so*"
-                    include "**/*.a"
-                }
+            FileCollection extractedFiles = null as FileCollection
+            def nativeZips = project.configurations.native3rdPartyDeps
+
+            nativeZips.dependencies
+                    .matching { Dependency dep -> dep != null && nativeZips.files(dep).size() > 0 }
+                    .all { Dependency dep ->
+                        nativeZips.files(dep).each { single_dep ->
+                            def ziptree = project.zipTree(single_dep)
+                            ["**/*.so*", "**/*.so", "**/*.dll", "**/*.dylib"].collect { String pattern ->
+                                def fc = ziptree.matching { PatternFilterable pat -> pat.include(pattern) }
+                                if (extractedFiles == null) extractedFiles = fc
+                                else extractedFiles += fc
+                            }
+                        }
+                    }
+
+            File dir = new File(project.buildDir, "native_libs")
+            if (dir.exists()) dir.deleteDir()
+            dir.parentFile.mkdirs()
+
+            project.copy { CopySpec s ->
+                s.from(project.files { extractedFiles.files })
+                s.into(dir)
             }
         }
 
@@ -108,14 +118,9 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
                 "com.snobot.simulator:snobot_sim_java:${snobotSimVersionExt.snobotSimVersion}",
                 "com.snobot.simulator:snobot_sim_utilities:${snobotSimVersionExt.snobotSimVersion}",
                 "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}",
-                "com.snobot.simulator:adx_family:${snobotSimVersionExt.snobotSimVersion}:all",
                 "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}",
-                "com.snobot.simulator:navx_simulator:${snobotSimVersionExt.snobotSimVersion}:all",
-                "com.snobot.simulator:wpilib:${snobotSimVersionExt.snobotSimVersion}:all",
                 "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}",
-                "com.snobot.simulator:ctre_sim_override:${snobotSimVersionExt.snobotSimCtreVersion}:native-all",
                 "com.snobot.simulator:temp_hal_interface:${snobotSimVersionExt.snobotSimVersion}",
-                "com.snobot.simulator:temp_hal_interface:${snobotSimVersionExt.snobotSimVersion}:all",
                 "jfree:jcommon:${snobotSimVersionExt.jfreecommon}",
                 "jfree:jfreechart:${snobotSimVersionExt.jfreechart}",
                 "org.apache.logging.log4j:log4j-api:${snobotSimVersionExt.log4j}",
@@ -123,7 +128,7 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
                 "org.yaml:snakeyaml:${snobotSimVersionExt.snakeyaml}",
                 "com.miglayout:miglayout-swing:${snobotSimVersionExt.miglayout}",
                 "com.miglayout:miglayout-core:${snobotSimVersionExt.miglayout}",
-                "org.opencv:opencv-jni:${snobotSimVersionExt.opencv}:all",
+                "org.opencv:opencv-jni:${snobotSimVersionExt.opencv}:${nativeclassifier}",
                 "net.java.jinput:jinput:2.0.7",
                 "net.java.jutils:jutils:1.0.0",
             ]
@@ -132,25 +137,12 @@ class SnobotSimSetupPlugin implements Plugin<Project> {
         }
 
         project.dependencies.ext.snobotSimJavaCompile = {
-            def l = ["edu.wpi.first.ntcore:ntcore-jni:${snobotSimVersionExt.ntcore}:all", "edu.wpi.first.cscore:cscore-jni:${snobotSimVersionExt.cscore}:all",]
+            def l = [
+                "edu.wpi.first.ntcore:ntcore-jni:${snobotSimVersionExt.ntcore}:${nativeclassifier}",
+                "edu.wpi.first.cscore:cscore-jni:${snobotSimVersionExt.cscore}:${nativeclassifier}",
+            ]
 
             l
         }
-    }
-
-    String getOsName()
-    {
-
-        def os_name = ""
-        if (OperatingSystem.current().isWindows())
-        {
-            os_name = "windows"
-        }
-        else
-        {
-            os_name = "linux"
-        }
-
-        return os_name;
     }
 }
