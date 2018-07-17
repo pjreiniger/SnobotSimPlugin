@@ -12,4 +12,4 @@ install:
 - ./gradlew -version
 
 script:
-- ./gradlew build publishToMavenLocal --scan --stacktrace
+- ./gradlew build publishToMavenLocal
