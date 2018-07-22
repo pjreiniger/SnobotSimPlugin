@@ -8,6 +8,8 @@ import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.jvm.tasks.Jar
 
+import jaci.gradle.toolchains.ToolchainsPlugin
+
 class RunSnobotSimPlugin implements Plugin<Project> {
     void apply(Project project) {
 
@@ -19,14 +21,30 @@ class RunSnobotSimPlugin implements Plugin<Project> {
                     task.description ="Runs the simulator with SnobotSim"
                     task.dependsOn jarTask
 
+                    if(project.tasks.findByName("simulatorExtensionJar")) {
+                        task.dependsOn "simulatorExtensionJar"
+                    }
+
                     task.doLast {
 
                         def classpath = jarTask.archivePath.toString() + ";"
-                        classpath = addToClasspath(project.configurations.getByName("testCompile"), classpath)
+                        classpath = addToClasspath(project.configurations.getByName("compile"), classpath)
+                        classpath = addToClasspath(project.configurations.getByName("snobotSimCompile"), classpath)
+
+                        if(project.tasks.findByName("simulatorExtensionJar")) {
+                            project.tasks.getByName("simulatorExtensionJar").outputs.files.each {
+                                classpath += it.getAbsolutePath() + ";"
+                            }
+                        }
+
+
                         classpath = classpath[ 0..-2 ] // Remove extra semicolon.  Two because there is a space
 
                         def ldpath = "build/native_libs" + envDelimiter()
 
+                        project.plugins.withType(ToolchainsPlugin).all {
+                            ldpath += "build/native_libs_cpp" + envDelimiter()
+                        }
 
                         List<String> args = new ArrayList<>();
                         args.add(OperatingSystem.current().isWindows() ? "java" : Jvm.current().getExecutable("java").absolutePath)
