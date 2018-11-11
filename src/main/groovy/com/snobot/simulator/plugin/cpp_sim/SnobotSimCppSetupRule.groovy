@@ -13,6 +13,9 @@ import jaci.gradle.nativedeps.CombinedNativeLib
 import jaci.gradle.nativedeps.NativeDepsSpec
 import jaci.gradle.nativedeps.NativeLib
 
+import com.snobot.simulator.plugin.SnobotSimulatorVersionsExtension
+import edu.wpi.first.gradlerio.wpi.WPIExtension
+
 
 @CompileStatic
 public class SnobotSimCppSetupRule implements Plugin<Project> {
@@ -54,8 +57,8 @@ public class SnobotSimCppSetupRule implements Plugin<Project> {
                     common(lib)
                     lib.libraryName = "${name}_binaries"
                     lib.targetPlatforms = ['desktop']
-                    lib.staticMatchers = ["**/*${libname}.lib".toString()]
-                    lib.sharedMatchers = ["**/*${libname}.so".toString(), "**/*${libname}.dylib".toString()]
+                    lib.staticMatchers = ["**/shared/**/*${libname}.lib".toString()]
+                    lib.sharedMatchers = ["**/shared/**/*${libname}.so".toString(), "**/shared/**/*${libname}.dylib".toString()]
 
                     lib.dynamicMatchers = lib.sharedMatchers + "**/${libname}.dll".toString()
                     lib.maven = "${mavenBase}:${nativeclassifier}@zip"
@@ -75,31 +78,24 @@ public class SnobotSimCppSetupRule implements Plugin<Project> {
                     null
                 }
             }
+			
+            def wpilibExt = extensionContainer.getByType(WPIExtension)
+            def snobotSimExt = extensionContainer.getByType(SnobotSimulatorVersionsExtension)
+			System.out.println("Snobot.. " + snobotSimExt.snobotSimVersion + ", " + wpilibExt.wpilibVersion);
 
-            createWpiLibrary('snobot_sim', "com.snobot.simulator:snobot_sim:2018-2.1.0", 'snobot_sim', true)
-            createWpiLibrary('snobot_sim_jni', "com.snobot.simulator:snobot_sim_jni:2018-2.1.0", 'snobot_sim_jni', true)
-            createWpiLibrary('snobot_sim_cpp_standalone', "com.snobot.simulator:snobot_sim_cpp_standalone:2018-2.1.0", 'snobot_sim_cpp_standalone', true)
-
-            createWpiLibrary('adx_family', "com.snobot.simulator:adx_family:2018-2.1.0", 'adx_family', true)
-            createWpiLibrary('navx_simulator', "com.snobot.simulator:navx_simulator:2018-2.1.0", 'navx_simulator', true)
-            createWpiLibrary('halsim-adx_gyro_accelerometer', "edu.wpi.first.halsim:halsim-adx_gyro_accelerometer:2018.4.1", 'halsim_adx_gyro_accelerometer', true)
-
-            libs.create("snobot_sim_jni_cpp_wrapper_headers", NativeLib) { NativeLib lib ->
-                common(lib)
-                lib.targetPlatforms << 'desktop'
-                lib.headerDirs << ''
-                lib.maven = "com.snobot.simulator:snobot_sim_jni:2018-2.1.0:cpp_jni_wrapper-headers@zip"
-            }
-
-
+            createWpiLibrary('snobot_sim', "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', true)
+            createWpiLibrary('adx_family', "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', true)
+            createWpiLibrary('navx_simulator', "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', true)
+			
+			// Not done with GradleRIO
+            createWpiLibrary('halsim-adx_gyro_accelerometer', "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpilibExt.wpilibVersion}", 'halsim_adx_gyro_accelerometer', true)
 
             libs.create('snobot_sim_cpp', CombinedNativeLib) { CombinedNativeLib clib ->
                 clib.libs <<
                         "snobot_sim" <<
-                        "snobot_sim_cpp_standalone" <<
-                        "snobot_sim_jni_cpp_wrapper_headers" <<
                         "adx_family" <<
-                        "navx_simulator"
+                        "navx_simulator" <<
+                        "halsim-adx_gyro_accelerometer"
 
                 clib.targetPlatforms = ['desktop']
                 null

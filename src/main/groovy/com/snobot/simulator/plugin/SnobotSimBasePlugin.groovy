@@ -58,7 +58,6 @@ class SnobotSimBasePlugin implements Plugin<Project> {
             snobotSimBaseNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
             snobotSimBaseNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
             snobotSimBaseNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
-            snobotSimBaseNative "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
 
             // Not done with GradleRIO
             snobotSimBaseNative "edu.wpi.first.halsim:halsim-adx_gyro_accelerometer:${snobotSimExt.wpilib}:${nativeclassifier}@zip"

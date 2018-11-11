@@ -15,7 +15,6 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         project.pluginManager.apply(WPICommonDeps)
 
         def wpilibExt = project.extensions.getByType(WPIExtension)
-        def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
 
         setupSnobotSimCppDeps(project, wpilibExt)
         extractLibs(project, "snobotSimCppNative", "native_libs_cpp")
@@ -36,19 +35,16 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         { snobotSimCppNative }
 
         project.dependencies {
-            snobotSimCppNative "edu.wpi.first.wpilibc:wpilibc:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.ntcoreVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.cscore:cscore-cpp:${wpiExt.cscoreVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "org.opencv:opencv-cpp:${wpiExt.opencvVersion}:${nativeclassifier}@zip"
-
-            snobotSimCppNative "edu.wpi.first.wpilibj:wpilibj-jniShared:${wpiExt.wpilibVersion}:${nativeclassifier}"
+            snobotSimCppNative "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            snobotSimCppNative "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            snobotSimCppNative "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
         }
 
         project.dependencies.ext.snobotSimCpp = {
             def output = [
                 "edu.wpi.first.wpilibj:wpilibj-java:${wpiExt.wpilibVersion}",
-                "edu.wpi.first.ntcore:ntcore-java:${wpiExt.ntcoreVersion}",
-                "edu.wpi.first.wpiutil:wpiutil-java:${wpiExt.wpiutilVersion}",
+                "edu.wpi.first.ntcore:ntcore-java:${wpiExt.wpilibVersion}",
+                "edu.wpi.first.wpiutil:wpiutil-java:${wpiExt.wpilibVersion}",
             ]
 
             project.dependencies.ext.snobotSimBase().each { output << it }
