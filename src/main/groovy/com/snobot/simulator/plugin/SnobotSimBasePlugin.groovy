@@ -50,14 +50,6 @@ class SnobotSimBasePlugin implements Plugin<Project> {
                 null
                 )
 
-        def snobotSimCtreVersion = snobotSimExt.snobotSimCtreVersion + "_" + wpiExt.ctreVersion
-
-        //TODO temporary
-        if (wpiExt.ctreVersion == "5.5.1.0")
-        {
-            snobotSimCtreVersion = snobotSimExt.snobotSimCtreVersion + "_5.1.2.1"
-        }
-
         project.configurations
         { snobotSimBaseNative }
 
@@ -66,11 +58,9 @@ class SnobotSimBasePlugin implements Plugin<Project> {
             snobotSimBaseNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
             snobotSimBaseNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
             snobotSimBaseNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
-            snobotSimBaseNative "com.snobot.simulator:temp_hal_interface:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
-            snobotSimBaseNative "com.snobot.simulator:ctre_sim_override:${snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
+            snobotSimBaseNative "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
 
-            snobotSimBaseNative "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpiutilVersion}:${nativeclassifier}@zip"
-            snobotSimBaseNative "edu.wpi.first.hal:hal:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            // Not done with GradleRIO
             snobotSimBaseNative "edu.wpi.first.halsim:halsim-adx_gyro_accelerometer:${snobotSimExt.wpilib}:${nativeclassifier}@zip"
         }
 
@@ -81,8 +71,7 @@ class SnobotSimBasePlugin implements Plugin<Project> {
                 "com.snobot.simulator:snobot_sim_utilities:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}",
-                "com.snobot.simulator:ctre_sim_override:${snobotSimCtreVersion}",
-                "com.snobot.simulator:temp_hal_interface:${snobotSimExt.snobotSimVersion}",
+                "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}",
                 "jfree:jfreechart:${snobotSimExt.jfreechart}",
                 "org.apache.logging.log4j:log4j-core:${snobotSimExt.log4j}",
                 "org.yaml:snakeyaml:${snobotSimExt.snakeyaml}",
@@ -92,7 +81,7 @@ class SnobotSimBasePlugin implements Plugin<Project> {
         }
     }
 
-    void extractLibs(Project project, String configurationName, String outputDirectory, deleteOldFolder=true) {
+    void extractLibs(Project project, String configurationName, String outputDirectory, deleteOldFolder=false) {
         def nativeZips = project.configurations.getByName(configurationName)
 
         project.task("snobotSimUnzip${configurationName}", type: Zip, dependsOn: nativeZips) { Task task ->
@@ -131,6 +120,6 @@ class SnobotSimBasePlugin implements Plugin<Project> {
 
     static String getExtractedPath()
     {
-        return "native_libs";
+        return "tmp/jniExtractDir";
     }
 }

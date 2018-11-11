@@ -40,11 +40,7 @@ class RunSnobotSimPlugin implements Plugin<Project> {
 
                         classpath = classpath[ 0..-2 ] // Remove extra semicolon.  Two because there is a space
 
-                        def ldpath = "build/native_libs" + envDelimiter()
-
-                        project.plugins.withType(ToolchainsPlugin).all {
-                            ldpath += "build/native_libs_cpp" + envDelimiter()
-                        }
+                        def ldpath = "build/tmp/jniExtractDir" + envDelimiter()
 
                         List<String> args = new ArrayList<>();
                         args.add(OperatingSystem.current().isWindows() ? "java" : Jvm.current().getExecutable("java").absolutePath)

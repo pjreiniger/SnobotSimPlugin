@@ -15,7 +15,6 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
         def wpilibExt = project.extensions.getByType(WPIExtension)
 
         setupSnobotSimJavaDeps(project, wpilibExt)
-        extractLibs(project, "snobotSimJavaNative", "native_libs_java", false)
     }
 
     void setupSnobotSimJavaDeps(Project project, WPIExtension wpiExt) {
@@ -31,15 +30,10 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
         project.configurations
         { snobotSimJavaNative }
 
-        project.dependencies {
-            snobotSimJavaNative "edu.wpi.first.wpilibj:wpilibj-jniShared:${wpiExt.wpilibVersion}:${nativeclassifier}"
-            snobotSimJavaNative "org.opencv:opencv-jni:${wpiExt.opencvVersion}:${nativeclassifier}"
-        }
-
         project.dependencies.ext.snobotSimJava = {
             def output = [
-                "edu.wpi.first.ntcore:ntcore-jni:${wpiExt.ntcoreVersion}:${nativeclassifier}",
-                "edu.wpi.first.cscore:cscore-jni:${wpiExt.cscoreVersion}:${nativeclassifier}",
+                "edu.wpi.first.ntcore:ntcore-jni:${wpiExt.wpilibVersion}:${nativeclassifier}",
+                "edu.wpi.first.cscore:cscore-jni:${wpiExt.wpilibVersion}:${nativeclassifier}",
             ]
 
             project.dependencies.ext.snobotSimBase().each { output << it }
