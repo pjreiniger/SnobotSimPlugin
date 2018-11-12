@@ -15,13 +15,14 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         project.pluginManager.apply(WPICommonDeps)
 
         def wpilibExt = project.extensions.getByType(WPIExtension)
+        def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
 
-        setupSnobotSimCppDeps(project, wpilibExt)
-        extractLibs(project, "snobotSimCppNative", "native_libs_cpp")
+        setupSnobotSimCppDeps(project, snobotSimExt, wpilibExt)
+        extractLibs(project, "snobotSimCppNative", getExtractedPath())
     }
 
 
-    void setupSnobotSimCppDeps(Project project, WPIExtension wpiExt) {
+    void setupSnobotSimCppDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
 
         def nativeclassifier = (
                 OperatingSystem.current().isWindows() ?
@@ -38,13 +39,23 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
             snobotSimCppNative "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
             snobotSimCppNative "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
             snobotSimCppNative "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            snobotSimCppNative "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            snobotSimCppNative "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            snobotSimCppNative "edu.wpi.first.cameraserver:cameraserver-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+            snobotSimCppNative "edu.wpi.first.thirdparty.frc2019.opencv:opencv-cpp:${wpiExt.opencvVersion}:${nativeclassifier}@zip"
+
+            snobotSimCppNative "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}:${nativeclassifier}@zip"
         }
 
         project.dependencies.ext.snobotSimCpp = {
             def output = [
                 "edu.wpi.first.wpilibj:wpilibj-java:${wpiExt.wpilibVersion}",
                 "edu.wpi.first.ntcore:ntcore-java:${wpiExt.wpilibVersion}",
+                "edu.wpi.first.cscore:cscore-java:${wpiExt.wpilibVersion}",
                 "edu.wpi.first.wpiutil:wpiutil-java:${wpiExt.wpilibVersion}",
+                
+                "edu.wpi.first.hal:hal-java:${wpiExt.wpilibVersion}",
+                "edu.wpi.first.cameraserver:cameraserver-java:${wpiExt.wpilibVersion}",
             ]
 
             project.dependencies.ext.snobotSimBase().each { output << it }
