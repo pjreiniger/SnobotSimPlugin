@@ -16,7 +16,9 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
     void apply(Project project) {
         SnobotSimulatorVersionsExtension snobotSimExtension = project.extensions.create("snobotSim", SnobotSimulatorVersionsExtension, project)
 
-        project.pluginManager.apply(RunSnobotSimPlugin)
+        project.pluginManager.apply(RunJavaSnobotSimPlugin)
+        project.pluginManager.apply(RunCppSnobotSimPlugin)
+
         project.pluginManager.apply(SnobotSimJavaRobotPlugin)
 
         project.plugins.withType(ToolchainsPlugin).all {

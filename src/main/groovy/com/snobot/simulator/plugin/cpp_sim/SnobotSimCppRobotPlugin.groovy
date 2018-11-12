@@ -11,14 +11,22 @@ import edu.wpi.first.gradlerio.wpi.dependencies.WPICommonDeps
 
 public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
 
-    void apply(Project project) {
-        project.pluginManager.apply(WPICommonDeps)
+   SnobotSimCppRobotPlugin() {
+       super("tmp/snobotSimCppNative", "snobotSimCppNative");
+   }
 
+    void apply(Project project) {
         def wpilibExt = project.extensions.getByType(WPIExtension)
         def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
 
+        project.configurations
+        { snobotSimCppNative }
+		
         setupSnobotSimCppDeps(project, snobotSimExt, wpilibExt)
-        extractLibs(project, "snobotSimCppNative", getExtractedPath())
+	    super.applyBase(project)
+
+        project.pluginManager.apply(WPICommonDeps)
+        extractLibs(project, "snobotSimCppNative", mNativeDir)
     }
 
 
@@ -32,8 +40,16 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
                 null
                 )
 
-        project.configurations
-        { snobotSimCppNative }
+        project.dependencies
+        {
+            snobotSimCppNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
+            snobotSimCppNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
+            snobotSimCppNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
+            snobotSimCppNative "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
+
+            // Not done with GradleRIO
+            snobotSimCppNative "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
+        }
 
         project.dependencies {
             snobotSimCppNative "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"

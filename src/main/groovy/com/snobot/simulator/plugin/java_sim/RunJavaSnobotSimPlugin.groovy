@@ -10,13 +10,13 @@ import org.gradle.jvm.tasks.Jar
 
 import jaci.gradle.toolchains.ToolchainsPlugin
 
-class RunSnobotSimPlugin implements Plugin<Project> {
+class RunJavaSnobotSimPlugin implements Plugin<Project> {
     void apply(Project project) {
 
         project.tasks.withType(Jar).all { Jar jarTask ->
             def attr = jarTask.manifest.attributes
             if (jarTask.name.equals("jar")) {
-                project.tasks.create("runSnobotSim") { Task task ->
+                project.tasks.create("runJavaSnobotSim") { Task task ->
                     task.group = "SnobotSimulator"
                     task.description ="Runs the simulator with SnobotSim"
                     task.dependsOn jarTask
@@ -40,7 +40,7 @@ class RunSnobotSimPlugin implements Plugin<Project> {
 
                         classpath = classpath[ 0..-2 ] // Remove extra semicolon.  Two because there is a space
 
-                        def ldpath = "build/tmp/jniExtractDir" + envDelimiter()
+                        def ldpath = "build/tmp/snobotSimJava" + envDelimiter()
 
                         List<String> args = new ArrayList<>();
                         args.add(OperatingSystem.current().isWindows() ? "java" : Jvm.current().getExecutable("java").absolutePath)

@@ -12,11 +12,27 @@ import org.gradle.internal.os.OperatingSystem
 
 import edu.wpi.first.gradlerio.wpi.WPIExtension
 
-class SnobotSimBasePlugin implements Plugin<Project> {
+abstract class SnobotSimBasePlugin implements Plugin<Project> {
 
-    void apply(Project project) {
+    protected String mNativeDir;
+	protected String mConfigurationName;
+	
 
-
+    protected def nativeSnobotSimClassifier = (
+            OperatingSystem.current().isWindows() ?
+            System.getProperty("os.arch") == 'amd64' ? 'windows-x86-64' : 'windows-x86' :
+            OperatingSystem.current().isMacOsX() ? "os x" :
+            OperatingSystem.current().isLinux() ? "linux" :
+            null
+            )
+	
+	SnobotSimBasePlugin(String aNativeDir, String aConfigurationName) {
+	    mNativeDir = aNativeDir
+		mConfigurationName = aConfigurationName
+	}
+	
+	void applyBase(Project project)
+	{
         project.repositories.maven { repo ->
             repo.name = "SnobotSim"
             repo.url = "http://raw.githubusercontent.com/pjreiniger/maven_repo/master/"
@@ -28,41 +44,10 @@ class SnobotSimBasePlugin implements Plugin<Project> {
         def wpilibExt = project.extensions.getByType(WPIExtension)
         def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
         setupSnobotSimBaseDeps(project, snobotSimExt, wpilibExt)
-        extractLibs(project, "snobotSimBaseNative", getExtractedPath())
-    }
+	}
 
 
     void setupSnobotSimBaseDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
-
-        def nativeclassifier = (
-                OperatingSystem.current().isWindows() ?
-                System.getProperty("os.arch") == 'amd64' ? 'windowsx86-64' : 'windowsx86' :
-                OperatingSystem.current().isMacOsX() ? "osxx86-64" :
-                OperatingSystem.current().isLinux() ? "linuxx86-64" :
-                null
-                )
-
-        def nativeSnobotSimClassifier = (
-                OperatingSystem.current().isWindows() ?
-                System.getProperty("os.arch") == 'amd64' ? 'windows-x86-64' : 'windows-x86' :
-                OperatingSystem.current().isMacOsX() ? "os x" :
-                OperatingSystem.current().isLinux() ? "linux" :
-                null
-                )
-
-        project.configurations
-        { snobotSimBaseNative }
-
-        project.dependencies
-        {
-            snobotSimBaseNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
-            snobotSimBaseNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
-            snobotSimBaseNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
-            snobotSimBaseNative "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
-
-            // Not done with GradleRIO
-            snobotSimBaseNative "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-        }
 
         project.dependencies.ext.snobotSimBase = {
             [
@@ -111,15 +96,10 @@ class SnobotSimBasePlugin implements Plugin<Project> {
                 dir.parentFile.mkdirs()
             }
 
-            project.copy { CopySpec s ->
-                s.from(project.files { extractedFiles.files })
-                s.into(dir)
-            }
+			project.copy { CopySpec s ->
+				s.from(project.files { extractedFiles.files })
+				s.into(dir)
+			}
         }
-    }
-
-    static String getExtractedPath()
-    {
-        return "tmp/jniExtractDir";
     }
 }
