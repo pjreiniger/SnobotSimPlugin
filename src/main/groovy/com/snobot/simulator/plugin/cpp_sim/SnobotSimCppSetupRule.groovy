@@ -15,10 +15,13 @@ import jaci.gradle.nativedeps.NativeLib
 
 import com.snobot.simulator.plugin.SnobotSimulatorVersionsExtension
 import edu.wpi.first.gradlerio.wpi.WPIExtension
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @CompileStatic
 public class SnobotSimCppSetupRule implements Plugin<Project> {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void apply(Project project) {
@@ -81,7 +84,6 @@ public class SnobotSimCppSetupRule implements Plugin<Project> {
 			
             def wpilibExt = extensionContainer.getByType(WPIExtension)
             def snobotSimExt = extensionContainer.getByType(SnobotSimulatorVersionsExtension)
-			System.out.println("Snobot.. " + snobotSimExt.snobotSimVersion + ", " + wpilibExt.wpilibVersion);
 
             createWpiLibrary('snobot_sim', "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', true)
             createWpiLibrary('adx_family', "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', true)

@@ -7,10 +7,14 @@ import org.gradle.api.Task
 import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.jvm.tasks.Jar
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jaci.gradle.toolchains.ToolchainsPlugin
 
 class RunJavaSnobotSimPlugin implements Plugin<Project> {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     void apply(Project project) {
 
         project.tasks.withType(Jar).all { Jar jarTask ->
@@ -34,6 +38,7 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
                         if(project.tasks.findByName("simulatorExtensionJar")) {
                             project.tasks.getByName("simulatorExtensionJar").outputs.files.each {
                                 classpath += it.getAbsolutePath() + ";"
+					            logger.info("Adding custom extension to the classpath: " + it.getAbsolutePath());
                             }
                         }
 
@@ -65,6 +70,7 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
             def the_dep = configurationType.files(it)
             the_dep.each { depChild ->
                 classpath += depChild.toString() + ";"
+				logger.info("Adding dependency to classpath: " + depChild);
             }
         }
 

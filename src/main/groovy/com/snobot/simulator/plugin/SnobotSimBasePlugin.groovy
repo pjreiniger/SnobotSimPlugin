@@ -9,10 +9,13 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.internal.os.OperatingSystem
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.wpi.first.gradlerio.wpi.WPIExtension
 
 abstract class SnobotSimBasePlugin implements Plugin<Project> {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected String mNativeDir;
 	protected String mConfigurationName;
@@ -77,6 +80,7 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
                     .all { Dependency dep ->
                         nativeZips.files(dep).each { single_dep ->
                             def ziptree = project.zipTree(single_dep)
+                            logger.info("Extracting native " + single_dep)
                             ["**/*.so*", "**/*.so", "**/*.dll", "**/*.dylib"].collect { String pattern ->
                                 def fc = ziptree.matching { PatternFilterable pat -> pat.include(pattern) }
                                 if (extractedFiles == null) extractedFiles = fc
