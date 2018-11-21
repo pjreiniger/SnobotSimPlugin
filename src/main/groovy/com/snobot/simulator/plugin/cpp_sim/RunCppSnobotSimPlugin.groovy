@@ -19,10 +19,10 @@ class RunCppSnobotSimPlugin implements Plugin<Project> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     void apply(Project project) {
-			
-		File wrapperExtractDir = new File(project.getBuildDir(), "tmp/SnobotSimWrapper");
-	
-		project.tasks.create("copyWrapperLibrary", Copy) { Task task ->
+            
+        File wrapperExtractDir = new File(project.getBuildDir(), "tmp/SnobotSimWrapper");
+    
+        project.tasks.create("copyWrapperLibrary", Copy) { Task task ->
             destinationDir = new File(project.buildDir, "/tmp/snobotSimCppNative")
                     
             project.model {
@@ -31,12 +31,12 @@ class RunCppSnobotSimPlugin implements Plugin<Project> {
                         if (binary.component.name == "snobotSimCppWrapper") {
                             dependsOn binary.buildTask
 
-			                if(!wrapperExtractDir.exists())
-			                {
-					            logger.info("Wrapper extraction has not been done... adding dependency");
+                            if(!wrapperExtractDir.exists())
+                            {
+                                logger.info("Wrapper extraction has not been done... adding dependency");
                                 binary.buildTask.dependsOn "extractSnobotSimCppWrapperFiles"
-			                }
-					
+                            }
+                    
                             from(binary.sharedLibraryFile) {
                                 into "."
                             }
@@ -44,37 +44,37 @@ class RunCppSnobotSimPlugin implements Plugin<Project> {
                     }
                 }
             }
-		}
-	
-		project.tasks.create("extractSnobotSimCppWrapperFiles") { Task task ->
-			
-			doLast {
+        }
+    
+        project.tasks.create("extractSnobotSimCppWrapperFiles") { Task task ->
+            
+            doLast {
                 logger.info("Running the extraction task...");
-			    def javaTxt = getClass().getClassLoader().getResourceAsStream("RobotSimulatorJni.java").text
-			    def headerTxt = getClass().getClassLoader().getResourceAsStream("SimulatorJniWrapper.h").text
-			    def jniTxt = getClass().getClassLoader().getResourceAsStream("RobotSimulatorJni.h").text
-			    
-			    if(!wrapperExtractDir.exists())
-			    {
-                    wrapperExtractDir.mkdir();
-			    }
-			    
-			    new File(wrapperExtractDir, "RobotSimulatorJni.java") << javaTxt;
-			    new File(wrapperExtractDir, "SimulatorJniWrapper.h") << headerTxt;
-			    new File(wrapperExtractDir, "RobotSimulatorJni.h") << jniTxt;
-			    
-			    String robotName;
+                def javaTxt = getClass().getClassLoader().getResourceAsStream("RobotSimulatorJni.java").text
+                def headerTxt = getClass().getClassLoader().getResourceAsStream("SimulatorJniWrapper.h").text
+                def jniTxt = getClass().getClassLoader().getResourceAsStream("RobotSimulatorJni.h").text
                 
-			    if(project.hasProperty("robotName"))
-			    {			
-			        robotName = project.robotName
-			    }
-			    else
-			    {
-			        robotName = "Robot"
-			    }
-			    
-			    def simulatorJniText = """			
+                if(!wrapperExtractDir.exists())
+                {
+                    wrapperExtractDir.mkdir();
+                }
+                
+                new File(wrapperExtractDir, "RobotSimulatorJni.java") << javaTxt;
+                new File(wrapperExtractDir, "SimulatorJniWrapper.h") << headerTxt;
+                new File(wrapperExtractDir, "RobotSimulatorJni.h") << jniTxt;
+                
+                String robotName;
+                
+                if(project.hasProperty("robotName"))
+                {            
+                    robotName = project.robotName
+                }
+                else
+                {
+                    robotName = "Robot"
+                }
+                
+                def simulatorJniText = """            
 #include "RobotSimulatorJni.h"
 #include "SimulatorJniWrapper.h"
 #include "${robotName}.h"
@@ -85,7 +85,7 @@ static SimulatorJniWrapper<${robotName}>* wrapper = NULL;
 JNIEXPORT void JNICALL Java_RobotSimulatorJni_createRobot
 (JNIEnv *, jclass)
 {
-	wrapper = new SimulatorJniWrapper<${robotName}>(std::make_shared<${robotName}>());
+    wrapper = new SimulatorJniWrapper<${robotName}>(std::make_shared<${robotName}>());
 }
 
 JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
@@ -94,9 +94,9 @@ JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
     wrapper->GetRobot()->StartCompetition();
 }
 """
-		    	new File(wrapperExtractDir, "RobotSimulatorJni.cpp") << simulatorJniText;
-		    }
-		}
+                new File(wrapperExtractDir, "RobotSimulatorJni.cpp") << simulatorJniText;
+            }
+        }
 
         project.tasks.withType(Jar).all { Jar jarTask ->
             def attr = jarTask.manifest.attributes
@@ -105,9 +105,9 @@ JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
                     task.group = "SnobotSimulator"
                     task.description ="Runs the simulator with SnobotSim"
                     task.dependsOn jarTask
-					
+                    
                     if(project.tasks.findByName("snobotSimCppWrapperReleaseSharedLibrary")) {
-					    jarTask.dependsOn "snobotSimCppWrapperReleaseSharedLibrary"
+                        jarTask.dependsOn "snobotSimCppWrapperReleaseSharedLibrary"
                         task.dependsOn "copyWrapperLibrary"
                     }
 
@@ -117,13 +117,13 @@ JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
 
                     task.doLast {
 
-                        def classpath = jarTask.archivePath.toString() + ";"
+                        def classpath = jarTask.archivePath.toString() + envDelimiter()
                         classpath = addToClasspath(project.configurations.getByName("compile"), classpath)
                         classpath = addToClasspath(project.configurations.getByName("snobotSimCompile"), classpath)
 
                         if(project.tasks.findByName("simulatorExtensionJar")) {
                             project.tasks.getByName("simulatorExtensionJar").outputs.files.each {
-                                classpath += it.getAbsolutePath() + ";"
+                                classpath += it.getAbsolutePath() + envDelimiter()
                             }
                         }
 
@@ -154,8 +154,8 @@ JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
         configurationType.dependencies.each {
             def the_dep = configurationType.files(it)
             the_dep.each { depChild ->
-                classpath += depChild.toString() + ";"
-				logger.info("Adding dependency to classpath: " + depChild);
+                classpath += depChild.toString() + envDelimiter()
+                logger.info("Adding dependency to classpath: " + depChild);
             }
         }
 

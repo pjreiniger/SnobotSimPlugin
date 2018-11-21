@@ -81,15 +81,15 @@ public class SnobotSimCppSetupRule implements Plugin<Project> {
                     null
                 }
             }
-			
+            
             def wpilibExt = extensionContainer.getByType(WPIExtension)
             def snobotSimExt = extensionContainer.getByType(SnobotSimulatorVersionsExtension)
 
             createWpiLibrary('snobot_sim', "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', true)
             createWpiLibrary('adx_family', "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', true)
             createWpiLibrary('navx_simulator', "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', true)
-			
-			// Not done with GradleRIO
+            
+            // Not done with GradleRIO
             createWpiLibrary('halsim-adx_gyro_accelerometer', "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpilibExt.wpilibVersion}", 'halsim_adx_gyro_accelerometer', true)
 
             libs.create('snobot_sim_cpp', CombinedNativeLib) { CombinedNativeLib clib ->

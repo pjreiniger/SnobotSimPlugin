@@ -21,7 +21,7 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
 
         project.configurations
         { snobotSimJavaNative }
-		
+        
         setupSnobotSimJavaDeps(project, snobotSimExt, wpilibExt)
         super.applyBase(project);
         extractLibs(project, "snobotSimJavaNative", mNativeDir)
@@ -29,21 +29,13 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
 
     void setupSnobotSimJavaDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
 
-        def nativeclassifier = (
-                OperatingSystem.current().isWindows() ?
-                System.getProperty("os.arch") == 'amd64' ? 'windowsx86-64' : 'windowsx86' :
-                OperatingSystem.current().isMacOsX() ? "osxx86-64" :
-                OperatingSystem.current().isLinux() ? "linuxx86-64" :
-                null
-                )
-
         project.dependencies {
             snobotSimJavaNative "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
             snobotSimJavaNative "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-			
-			snobotSimJavaNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
-            snobotSimJavaNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
-            snobotSimJavaNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeSnobotSimClassifier}"
+            
+            snobotSimJavaNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
+            snobotSimJavaNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}"
+            snobotSimJavaNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}"
             snobotSimJavaNative "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
 
             // Not done with GradleRIO

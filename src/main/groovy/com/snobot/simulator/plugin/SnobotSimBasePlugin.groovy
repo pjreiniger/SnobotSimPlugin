@@ -18,8 +18,8 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected String mNativeDir;
-	protected String mConfigurationName;
-	
+    protected String mConfigurationName;
+    
 
     protected def nativeSnobotSimClassifier = (
             OperatingSystem.current().isWindows() ?
@@ -28,14 +28,23 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
             OperatingSystem.current().isLinux() ? "linux" :
             null
             )
-	
-	SnobotSimBasePlugin(String aNativeDir, String aConfigurationName) {
-	    mNativeDir = aNativeDir
-		mConfigurationName = aConfigurationName
-	}
-	
-	void applyBase(Project project)
-	{
+
+    protected def nativeclassifier = (
+            OperatingSystem.current().isWindows() ?
+            System.getProperty("os.arch") == 'amd64' ? 'windowsx86-64' : 'windowsx86' :
+            OperatingSystem.current().isMacOsX() ? "osxx86-64" :
+            OperatingSystem.current().isLinux() ? "linuxx86-64" :
+            null
+            )
+
+    
+    SnobotSimBasePlugin(String aNativeDir, String aConfigurationName) {
+        mNativeDir = aNativeDir
+        mConfigurationName = aConfigurationName
+    }
+    
+    void applyBase(Project project)
+    {
         project.repositories.maven { repo ->
             repo.name = "SnobotSim"
             repo.url = "http://raw.githubusercontent.com/pjreiniger/maven_repo/master/"
@@ -47,7 +56,7 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
         def wpilibExt = project.extensions.getByType(WPIExtension)
         def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
         setupSnobotSimBaseDeps(project, snobotSimExt, wpilibExt)
-	}
+    }
 
 
     void setupSnobotSimBaseDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
@@ -100,10 +109,10 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
                 dir.parentFile.mkdirs()
             }
 
-			project.copy { CopySpec s ->
-				s.from(project.files { extractedFiles.files })
-				s.into(dir)
-			}
+            project.copy { CopySpec s ->
+                s.from(project.files { extractedFiles.files })
+                s.into(dir)
+            }
         }
     }
 }

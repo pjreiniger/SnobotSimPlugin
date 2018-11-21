@@ -31,14 +31,14 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
 
                     task.doLast {
 
-                        def classpath = jarTask.archivePath.toString() + ";"
+                        def classpath = jarTask.archivePath.toString() + envDelimiter()
                         classpath = addToClasspath(project.configurations.getByName("compile"), classpath)
                         classpath = addToClasspath(project.configurations.getByName("snobotSimCompile"), classpath)
 
                         if(project.tasks.findByName("simulatorExtensionJar")) {
                             project.tasks.getByName("simulatorExtensionJar").outputs.files.each {
-                                classpath += it.getAbsolutePath() + ";"
-					            logger.info("Adding custom extension to the classpath: " + it.getAbsolutePath());
+                                classpath += it.getAbsolutePath() + envDelimiter()
+                                logger.info("Adding custom extension to the classpath: " + it.getAbsolutePath());
                             }
                         }
 
@@ -69,8 +69,8 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
         configurationType.dependencies.each {
             def the_dep = configurationType.files(it)
             the_dep.each { depChild ->
-                classpath += depChild.toString() + ";"
-				logger.info("Adding dependency to classpath: " + depChild);
+                classpath += depChild.toString() + envDelimiter()
+                logger.info("Adding dependency to classpath: " + depChild);
             }
         }
 
