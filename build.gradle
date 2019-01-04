@@ -1,17 +1,13 @@
 // To publish - gradlew publishPlugins
 
 plugins {
-    id 'com.gradle.build-scan' version '1.9.1'
-    id 'com.gradle.plugin-publish' version '0.9.9'
-    id 'me.champeau.buildscan-recipes' version '0.2.0'
+    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'java-gradle-plugin'
     id 'idea'
+    id 'maven-publish'
     id 'eclipse'
+    id 'groovy'
 }
-
-
-apply plugin: 'groovy'
-apply plugin: 'maven-publish'
-apply plugin: "com.gradle.plugin-publish"
 
 repositories {
     maven {
@@ -25,10 +21,15 @@ dependencies {
     compile localGroovy()
     testCompile gradleTestKit()
     
-    compile "gradle.plugin.edu.wpi.first:GradleRIO:2019.1.1-beta-1"
+    compile "edu.wpi.first:GradleRIO:2019.1.1"
 }
 
 archivesBaseName = "SnobotSimulatorPlugin"
+
+compileGroovy {
+    sourceCompatibility = '8'
+    targetCompatibility = '8'
+}
 
 publishing {
     repositories {
@@ -46,7 +47,7 @@ publishing {
 
 
 group = "com.snobot.simulator.plugin"
-version = "2019-0.0.0"
+version = "2019-0.1.0"
 
 pluginBundle {
     website = 'https://github.com/pjreiniger/SnobotSimPlugin'
@@ -63,6 +64,7 @@ pluginBundle {
 }
 
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
+wrapper {
+    gradleVersion = '5.0'
+    distributionType = Wrapper.DistributionType.ALL
 }

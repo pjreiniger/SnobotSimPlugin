@@ -1,4 +1,4 @@
-package com.snobot.simulator.plugin;
+package com.snobot.simulator.plugin.java_sim;
 
 
 import org.gradle.api.Plugin;
@@ -9,8 +9,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.gradle.jvm.tasks.Jar
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jaci.gradle.toolchains.ToolchainsPlugin
 
 class RunJavaSnobotSimPlugin implements Plugin<Project> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());

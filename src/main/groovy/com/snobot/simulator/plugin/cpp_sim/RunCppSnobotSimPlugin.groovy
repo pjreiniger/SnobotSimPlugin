@@ -1,4 +1,4 @@
-package com.snobot.simulator.plugin;
+package com.snobot.simulator.plugin.cpp_sim;
 
 
 import org.gradle.api.Plugin;
@@ -9,9 +9,6 @@ import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.jvm.tasks.Jar
 import org.gradle.nativeplatform.SharedLibraryBinarySpec
-
-import jaci.gradle.toolchains.ToolchainsPlugin
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,61 +16,55 @@ class RunCppSnobotSimPlugin implements Plugin<Project> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     void apply(Project project) {
-            
+
         File wrapperExtractDir = new File(project.getBuildDir(), "tmp/SnobotSimWrapper");
-    
+
         project.tasks.create("copyWrapperLibrary", Copy) { Task task ->
             destinationDir = new File(project.buildDir, "/tmp/snobotSimCppNative")
-                    
+
             project.model {
                 binaries {
                     withType(SharedLibraryBinarySpec) { binary ->
                         if (binary.component.name == "snobotSimCppWrapper") {
                             dependsOn binary.buildTask
 
-                            if(!wrapperExtractDir.exists())
-                            {
+                            if(!wrapperExtractDir.exists()) {
                                 logger.info("Wrapper extraction has not been done... adding dependency");
                                 binary.buildTask.dependsOn "extractSnobotSimCppWrapperFiles"
                             }
-                    
-                            from(binary.sharedLibraryFile) {
-                                into "."
-                            }
+
+                            from(binary.sharedLibraryFile) { into "." }
                         }
                     }
                 }
             }
         }
-    
+
         project.tasks.create("extractSnobotSimCppWrapperFiles") { Task task ->
-            
+
             doLast {
                 logger.info("Running the extraction task...");
                 def javaTxt = getClass().getClassLoader().getResourceAsStream("RobotSimulatorJni.java").text
                 def headerTxt = getClass().getClassLoader().getResourceAsStream("SimulatorJniWrapper.h").text
                 def jniTxt = getClass().getClassLoader().getResourceAsStream("RobotSimulatorJni.h").text
-                
-                if(!wrapperExtractDir.exists())
-                {
+
+                if(!wrapperExtractDir.exists()) {
                     wrapperExtractDir.mkdir();
                 }
-                
+
                 new File(wrapperExtractDir, "RobotSimulatorJni.java") << javaTxt;
                 new File(wrapperExtractDir, "SimulatorJniWrapper.h") << headerTxt;
                 new File(wrapperExtractDir, "RobotSimulatorJni.h") << jniTxt;
-                
+
                 String robotName;
-                
-                if(project.hasProperty("robotName"))
-                {            
+
+                if(project.hasProperty("robotName")) {
                     robotName = project.robotName
                 }
-                else
-                {
+                else {
                     robotName = "Robot"
                 }
-                
+
                 def simulatorJniText = """            
 #include "RobotSimulatorJni.h"
 #include "SimulatorJniWrapper.h"
@@ -105,7 +96,7 @@ JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
                     task.group = "SnobotSimulator"
                     task.description ="Runs the simulator with SnobotSim"
                     task.dependsOn jarTask
-                    
+
                     if(project.tasks.findByName("snobotSimCppWrapperReleaseSharedLibrary")) {
                         jarTask.dependsOn "snobotSimCppWrapperReleaseSharedLibrary"
                         task.dependsOn "copyWrapperLibrary"
