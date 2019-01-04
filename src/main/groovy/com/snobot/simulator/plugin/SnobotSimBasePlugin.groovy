@@ -19,37 +19,39 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
 
     protected String mNativeDir;
     protected String mConfigurationName;
-    
+
 
     protected def nativeSnobotSimClassifier = (
-            OperatingSystem.current().isWindows() ?
-            System.getProperty("os.arch") == 'amd64' ? 'windows-x86-64' : 'windows-x86' :
-            OperatingSystem.current().isMacOsX() ? "os x" :
-            OperatingSystem.current().isLinux() ? "linux" :
-            null
-            )
+    OperatingSystem.current().isWindows() ?
+    System.getProperty("os.arch") == 'amd64' ? 'windows-x86-64' : 'windows-x86' :
+    OperatingSystem.current().isMacOsX() ? "os x" :
+    OperatingSystem.current().isLinux() ? "linux" :
+    null
+    )
 
     protected def nativeclassifier = (
-            OperatingSystem.current().isWindows() ?
-            System.getProperty("os.arch") == 'amd64' ? 'windowsx86-64' : 'windowsx86' :
-            OperatingSystem.current().isMacOsX() ? "osxx86-64" :
-            OperatingSystem.current().isLinux() ? "linuxx86-64" :
-            null
-            )
+    OperatingSystem.current().isWindows() ?
+    System.getProperty("os.arch") == 'amd64' ? 'windowsx86-64' : 'windowsx86' :
+    OperatingSystem.current().isMacOsX() ? "osxx86-64" :
+    OperatingSystem.current().isLinux() ? "linuxx86-64" :
+    null
+    )
 
-    
+
     SnobotSimBasePlugin(String aNativeDir, String aConfigurationName) {
         mNativeDir = aNativeDir
         mConfigurationName = aConfigurationName
     }
-    
-    void applyBase(Project project)
-    {
+
+    void applyBase(Project project) {
         project.repositories.maven { repo ->
             repo.name = "SnobotSim"
             repo.url = "http://raw.githubusercontent.com/pjreiniger/maven_repo/master/"
         }
-
+        project.repositories.maven { repo ->
+            repo.name = "Wpi"
+            repo.url = "http://first.wpi.edu/FRC/roborio/maven/release/"
+        }
         project.repositories { mavenLocal() }
         project.repositories { mavenCentral() }
 
@@ -99,13 +101,11 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
                     }
 
             def File dir = new File(project.buildDir, outputDirectory)
-            if (deleteOldFolder && dir.exists())
-            {
+            if (deleteOldFolder && dir.exists()) {
                 dir.deleteDir()
             }
 
-            if(!dir.exists())
-            {
+            if(!dir.exists()) {
                 dir.parentFile.mkdirs()
             }
 

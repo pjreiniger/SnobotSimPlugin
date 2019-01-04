@@ -4,8 +4,10 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task
 
+import com.snobot.simulator.plugin.cpp_sim.RunCppSnobotSimPlugin
 import com.snobot.simulator.plugin.cpp_sim.SnobotSimCppRobotPlugin
 import com.snobot.simulator.plugin.cpp_sim.SnobotSimCppSetupRule
+import com.snobot.simulator.plugin.java_sim.RunJavaSnobotSimPlugin
 import com.snobot.simulator.plugin.java_sim.SnobotSimJavaRobotPlugin
 
 import jaci.gradle.toolchains.ToolchainsPlugin

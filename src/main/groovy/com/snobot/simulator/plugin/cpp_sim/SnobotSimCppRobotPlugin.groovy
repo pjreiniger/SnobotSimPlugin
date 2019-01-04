@@ -1,19 +1,17 @@
 package com.snobot.simulator.plugin.cpp_sim;
 
 import org.gradle.api.Project
-import org.gradle.internal.os.OperatingSystem
 
 import com.snobot.simulator.plugin.SnobotSimBasePlugin
 import com.snobot.simulator.plugin.SnobotSimulatorVersionsExtension
 
 import edu.wpi.first.gradlerio.wpi.WPIExtension
-import edu.wpi.first.gradlerio.wpi.dependencies.WPICommonDeps
 
 public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
 
-   SnobotSimCppRobotPlugin() {
-       super("tmp/snobotSimCppNative", "snobotSimCppNative");
-   }
+    SnobotSimCppRobotPlugin() {
+        super("tmp/snobotSimCppNative", "snobotSimCppNative");
+    }
 
     void apply(Project project) {
         def wpilibExt = project.extensions.getByType(WPIExtension)
@@ -21,19 +19,16 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
 
         project.configurations
         { snobotSimCppNative }
-        
+
         setupSnobotSimCppDeps(project, snobotSimExt, wpilibExt)
         super.applyBase(project)
 
-        project.pluginManager.apply(WPICommonDeps)
         extractLibs(project, "snobotSimCppNative", mNativeDir)
     }
 
-
     void setupSnobotSimCppDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
 
-        project.dependencies
-        {
+        project.dependencies {
             snobotSimCppNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
             snobotSimCppNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}"
             snobotSimCppNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}"
@@ -61,7 +56,6 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
                 "edu.wpi.first.ntcore:ntcore-java:${wpiExt.wpilibVersion}",
                 "edu.wpi.first.cscore:cscore-java:${wpiExt.wpilibVersion}",
                 "edu.wpi.first.wpiutil:wpiutil-java:${wpiExt.wpilibVersion}",
-                
                 "edu.wpi.first.hal:hal-java:${wpiExt.wpilibVersion}",
                 "edu.wpi.first.cameraserver:cameraserver-java:${wpiExt.wpilibVersion}",
             ]
