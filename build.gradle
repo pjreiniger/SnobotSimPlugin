@@ -1,7 +1,7 @@
 // To publish - gradlew publishPlugins
 
 plugins {
-    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'com.gradle.plugin-publish' version '0.9.9'
     id 'java-gradle-plugin'
     id 'idea'
     id 'maven-publish'
@@ -47,7 +47,7 @@ publishing {
 
 
 group = "com.snobot.simulator.plugin"
-version = "2019-0.1.0"
+version = "2019-0.2.0"
 
 pluginBundle {
     website = 'https://github.com/pjreiniger/SnobotSimPlugin'
@@ -65,6 +65,6 @@ pluginBundle {
 
 
 wrapper {
-    gradleVersion = '5.0'
+    gradleVersion = '4.9'
     distributionType = Wrapper.DistributionType.ALL
 }

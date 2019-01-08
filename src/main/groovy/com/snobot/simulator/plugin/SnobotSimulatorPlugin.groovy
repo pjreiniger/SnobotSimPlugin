@@ -3,6 +3,8 @@ package com.snobot.simulator.plugin
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
 
 import com.snobot.simulator.plugin.cpp_sim.RunCppSnobotSimPlugin
 import com.snobot.simulator.plugin.cpp_sim.SnobotSimCppRobotPlugin
@@ -14,9 +16,13 @@ import jaci.gradle.toolchains.ToolchainsPlugin
 
 
 class SnobotSimulatorPlugin implements Plugin<Project> {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     void apply(Project project) {
         SnobotSimulatorVersionsExtension snobotSimExtension = project.extensions.create("snobotSim", SnobotSimulatorVersionsExtension, project)
+
+        project.configurations.maybeCreate("snobotSimJavaNative")
+        project.configurations.maybeCreate("snobotSimCppNative")
 
         project.pluginManager.apply(RunJavaSnobotSimPlugin)
         project.pluginManager.apply(RunCppSnobotSimPlugin)
@@ -24,6 +30,7 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
         project.pluginManager.apply(SnobotSimJavaRobotPlugin)
 
         project.plugins.withType(ToolchainsPlugin).all {
+            logger.info("SnobotSim detected C++ Tools, adding plugins")
             project.pluginManager.apply(SnobotSimCppSetupRule)
             project.pluginManager.apply(SnobotSimCppRobotPlugin)
         }

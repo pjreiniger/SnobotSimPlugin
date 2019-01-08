@@ -2,12 +2,6 @@ package com.snobot.simulator.plugin;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.file.CopySpec
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.bundling.Zip
-import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.internal.os.OperatingSystem
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,15 +13,6 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
 
     protected String mNativeDir;
     protected String mConfigurationName;
-
-
-    protected def nativeSnobotSimClassifier = (
-    OperatingSystem.current().isWindows() ?
-    System.getProperty("os.arch") == 'amd64' ? 'windows-x86-64' : 'windows-x86' :
-    OperatingSystem.current().isMacOsX() ? "os x" :
-    OperatingSystem.current().isLinux() ? "linux" :
-    null
-    )
 
     protected def nativeclassifier = (
     OperatingSystem.current().isWindows() ?
@@ -77,42 +62,6 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
                 "com.miglayout:miglayout-swing:${snobotSimExt.miglayout}",
                 "net.java.jinput:jinput:${snobotSimExt.jinput}",
             ]
-        }
-    }
-
-    void extractLibs(Project project, String configurationName, String outputDirectory, deleteOldFolder=false) {
-        def nativeZips = project.configurations.getByName(configurationName)
-
-        project.task("snobotSimUnzip${configurationName}", type: Zip, dependsOn: nativeZips) { Task task ->
-
-            FileCollection extractedFiles = null as FileCollection
-            nativeZips.dependencies
-                    .matching { true}
-                    .all { Dependency dep ->
-                        nativeZips.files(dep).each { single_dep ->
-                            def ziptree = project.zipTree(single_dep)
-                            logger.info("Extracting native " + single_dep)
-                            ["**/*.so*", "**/*.so", "**/*.dll", "**/*.dylib"].collect { String pattern ->
-                                def fc = ziptree.matching { PatternFilterable pat -> pat.include(pattern) }
-                                if (extractedFiles == null) extractedFiles = fc
-                                else extractedFiles += fc
-                            }
-                        }
-                    }
-
-            def File dir = new File(project.buildDir, outputDirectory)
-            if (deleteOldFolder && dir.exists()) {
-                dir.deleteDir()
-            }
-
-            if(!dir.exists()) {
-                dir.parentFile.mkdirs()
-            }
-
-            project.copy { CopySpec s ->
-                s.from(project.files { extractedFiles.files })
-                s.into(dir)
-            }
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.snobot.simulator.plugin.java_sim;
 
-
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task
+import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.jvm.tasks.Jar
@@ -15,12 +15,24 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
 
     void apply(Project project) {
 
+        project.tasks.register("extractSnobotSimJavaJNI", ExtractSnobotSimJavaNatives) { ExtractSnobotSimJavaNatives t ->
+            t.group = "SnobotSimulator"
+        }
+
+        project.tasks.withType(Test).configureEach { Test t ->
+            t.dependsOn("extractSnobotSimJavaJNI")
+        }
+
         project.tasks.withType(Jar).all { Jar jarTask ->
             def attr = jarTask.manifest.attributes
             if (jarTask.name.equals("jar")) {
                 project.tasks.create("runJavaSnobotSim") { Task task ->
                     task.group = "SnobotSimulator"
                     task.description ="Runs the simulator with SnobotSim"
+
+                    task.dependsOn "extractSnobotSimJavaJNI"
+                    jarTask.dependsOn "extractSnobotSimJavaJNI"
+
                     task.dependsOn jarTask
 
                     if(project.tasks.findByName("simulatorExtensionJar")) {
