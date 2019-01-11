@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SnobotSimulatorVersionsExtension {
 
-    String snobotSimVersion = "2019-0.0.1"
+    String snobotSimVersion = "2019-0.0.1-RC"
     String snobotSimCtreVersion = "5.12.0_V0_RC"
     String jfreechart = "1.0.13"
     String jinput = "2.0.7"
