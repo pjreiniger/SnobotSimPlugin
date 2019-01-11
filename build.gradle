@@ -65,6 +65,6 @@ pluginBundle {
 
 
 wrapper {
-    gradleVersion = '4.9'
+    gradleVersion = '5.0'
     distributionType = Wrapper.DistributionType.ALL
 }
