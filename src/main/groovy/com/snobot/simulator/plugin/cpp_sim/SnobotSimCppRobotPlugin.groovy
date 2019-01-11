@@ -17,37 +17,32 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         def wpilibExt = project.extensions.getByType(WPIExtension)
         def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
 
-        project.configurations
-        { snobotSimCppNative }
-
         setupSnobotSimCppDeps(project, snobotSimExt, wpilibExt)
         super.applyBase(project)
-
-        extractLibs(project, "snobotSimCppNative", mNativeDir)
     }
 
     void setupSnobotSimCppDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
 
-        project.dependencies {
-            snobotSimCppNative "net.java.jinput:jinput:${snobotSimExt.jinput}"
-            snobotSimCppNative "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}"
-            snobotSimCppNative "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}"
-            snobotSimCppNative "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:native-${nativeSnobotSimClassifier}"
+        project.dependencies.ext.snobotSimCppNative = {
+            def output = [
+                "net.java.jinput:jinput:${snobotSimExt.jinput}",
+                "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
+                "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
+                "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:${nativeclassifier}",
+                // Not done with GradleRIO
+                "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                // CPP Specific
+                "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.cameraserver:cameraserver-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.thirdparty.frc2019.opencv:opencv-cpp:${wpiExt.opencvVersion}:${nativeclassifier}@zip",
+                "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}:${nativeclassifier}@zip"
+            ]
 
-            // Not done with GradleRIO
-            snobotSimCppNative "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-        }
-
-        project.dependencies {
-            snobotSimCppNative "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.cameraserver:cameraserver-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip"
-            snobotSimCppNative "edu.wpi.first.thirdparty.frc2019.opencv:opencv-cpp:${wpiExt.opencvVersion}:${nativeclassifier}@zip"
-
-            snobotSimCppNative "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}:${nativeclassifier}@zip"
+            output
         }
 
         project.dependencies.ext.snobotSimCpp = {
@@ -59,6 +54,9 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
                 "edu.wpi.first.hal:hal-java:${wpiExt.wpilibVersion}",
                 "edu.wpi.first.cameraserver:cameraserver-java:${wpiExt.wpilibVersion}",
             ]
+            project.dependencies.ext.snobotSimCppNative().each {
+                project.dependencies.add("snobotSimCppNative", it)
+            }
 
             project.dependencies.ext.snobotSimBase().each { output << it }
 
