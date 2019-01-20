@@ -21,6 +21,7 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
     void apply(Project project) {
         SnobotSimulatorVersionsExtension snobotSimExtension = project.extensions.create("snobotSim", SnobotSimulatorVersionsExtension, project)
 
+        project.configurations.maybeCreate("snobotSimCompile")
         project.configurations.maybeCreate("snobotSimJavaNative")
         project.configurations.maybeCreate("snobotSimCppNative")
 

@@ -19,6 +19,15 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
             t.group = "SnobotSimulator"
         }
 
+
+        if(project.sourceSets.findByName("simulatorExtensions") != null) {
+            project.tasks.register("simulatorExtensionJavaJar", Jar) {
+                baseName = "SnobotSimExtensions"
+                from project.sourceSets.simulatorExtensions.output
+            }
+        }
+
+
         project.tasks.withType(Test).configureEach { Test t ->
             t.dependsOn("extractSnobotSimJavaJNI")
         }
@@ -35,8 +44,8 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
 
                     task.dependsOn jarTask
 
-                    if(project.tasks.findByName("simulatorExtensionJar")) {
-                        task.dependsOn "simulatorExtensionJar"
+                    if(project.tasks.findByName("simulatorExtensionJavaJar")) {
+                        task.dependsOn "simulatorExtensionJavaJar"
                     }
 
                     task.doLast {
@@ -45,8 +54,8 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
                         classpath = addToClasspath(project.configurations.getByName("compile"), classpath)
                         classpath = addToClasspath(project.configurations.getByName("snobotSimCompile"), classpath)
 
-                        if(project.tasks.findByName("simulatorExtensionJar")) {
-                            project.tasks.getByName("simulatorExtensionJar").outputs.files.each {
+                        if(project.tasks.findByName("simulatorExtensionJavaJar")) {
+                            project.tasks.getByName("simulatorExtensionJavaJar").outputs.files.each {
                                 classpath += it.getAbsolutePath() + envDelimiter()
                                 logger.info("Adding custom extension to the classpath: " + it.getAbsolutePath());
                             }
