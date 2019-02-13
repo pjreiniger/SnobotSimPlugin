@@ -56,6 +56,7 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
                 "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}",
+                "com.snobot.simulator:rev_simulator:${snobotSimExt.snobotSimRevVersion}",
                 "jfree:jfreechart:${snobotSimExt.jfreechart}",
                 "org.apache.logging.log4j:log4j-core:${snobotSimExt.log4j}",
                 "org.yaml:snakeyaml:${snobotSimExt.snakeyaml}",
