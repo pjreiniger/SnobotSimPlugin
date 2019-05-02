@@ -20,6 +20,8 @@ public class JsonDependencyParser {
     private final Map<String, String> mMavenRepos;
     private final List<String> mJavaLibraries;
     private final List<String> mJniLibraries;
+    private final List<String> mCppLibraries;
+    private final List<String> mCppJavaLibraries;
 
     private String nativeclassifier = (
     OperatingSystem.current().isWindows() ?
@@ -33,6 +35,8 @@ public class JsonDependencyParser {
         mSlurper = new JsonSlurper();
         mJavaLibraries = new ArrayList<>();
         mJniLibraries = new ArrayList<>();
+        mCppLibraries = new ArrayList<>();
+        mCppJavaLibraries = new ArrayList<>();
 
         mMavenRepos = new HashMap<>();
         mMavenRepos.put("SnobotSim", "http://raw.githubusercontent.com/pjreiniger/maven_repo/master/")
@@ -77,6 +81,16 @@ public class JsonDependencyParser {
         configs.jni.each { String dep ->
             mJniLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
         }
+        if(configs.cpp != null) {
+            configs.cpp.each { String dep ->
+                mCppLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
+            }
+        }
+        if(configs.cpp_java != null) {
+            configs.cpp_java.each { String dep ->
+                mCppJavaLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
+            }
+        }
     }
 
     private void convertLibrariesToString(SnobotSimDependencyConfigs config, String wpilibVersion, List<JsonDependency> wpiVendors) {
@@ -95,6 +109,8 @@ public class JsonDependencyParser {
     private static class LibraryTuple {
         String[] java;
         String[] jni;
+        String[] cpp;
+        String[] cpp_java;
     }
 
     private static class SnobotSimCoreDependencyConfigs {

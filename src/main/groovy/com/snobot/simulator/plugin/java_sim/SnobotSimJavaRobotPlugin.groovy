@@ -15,7 +15,6 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
     }
 
     void apply(Project project) {
-
         def wpilibExt = project.extensions.getByType(WPIExtension)
 
         JsonDependencyParser parser = new JsonDependencyParser();
