@@ -26,20 +26,20 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         project.dependencies.ext.snobotSimCppNative = {
             def output = [
                 "net.java.jinput:jinput:${snobotSimExt.jinput}",
-                "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
-                "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
-                "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:${nativeclassifier}",
+                "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${mNativeClassifer}",
+                "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${mNativeClassifer}",
+                "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:${mNativeClassifer}",
                 // Not done with GradleRIO
-                "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
+                "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
                 // CPP Specific
-                "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.cameraserver:cameraserver-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.thirdparty.frc2019.opencv:opencv-cpp:${wpiExt.opencvVersion}:${nativeclassifier}@zip",
-                "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}:${nativeclassifier}@zip"
+                "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
+                "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
+                "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
+                "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
+                "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
+                "edu.wpi.first.cameraserver:cameraserver-cpp:${wpiExt.wpilibVersion}:${mNativeClassifer}@zip",
+                "edu.wpi.first.thirdparty.frc2019.opencv:opencv-cpp:${wpiExt.opencvVersion}:${mNativeClassifer}@zip",
+                "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}:${mNativeClassifer}@zip"
             ]
 
             output
