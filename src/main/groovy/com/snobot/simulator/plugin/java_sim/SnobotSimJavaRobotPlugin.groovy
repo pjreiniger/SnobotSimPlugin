@@ -4,7 +4,6 @@ import org.gradle.api.Project
 
 import com.snobot.simulator.plugin.JsonDependencyParser
 import com.snobot.simulator.plugin.SnobotSimBasePlugin
-import com.snobot.simulator.plugin.SnobotSimulatorVersionsExtension
 
 import edu.wpi.first.gradlerio.wpi.WPIExtension
 
@@ -16,12 +15,7 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
 
     void apply(Project project) {
 
-        def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
         def wpilibExt = project.extensions.getByType(WPIExtension)
-        System.out.println("Hello " + wpilibExt);
-        System.out.println("Hello " + wpilibExt.deps);
-        System.out.println("Hello " + wpilibExt.deps.vendor);
-        System.out.println("Hello " + wpilibExt.deps.vendor.getDependencies());
 
         JsonDependencyParser parser = new JsonDependencyParser();
         parser.loadSnobotSimConfig(wpilibExt.deps);

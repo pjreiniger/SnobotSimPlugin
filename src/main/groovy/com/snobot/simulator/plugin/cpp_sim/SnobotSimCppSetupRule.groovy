@@ -7,16 +7,13 @@ import org.gradle.internal.os.OperatingSystem
 import org.gradle.language.base.plugins.ComponentModelBasePlugin
 import org.gradle.model.Mutate
 import org.gradle.model.RuleSource
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import groovy.transform.CompileStatic
 import jaci.gradle.nativedeps.CombinedNativeLib
 import jaci.gradle.nativedeps.NativeDepsSpec
 import jaci.gradle.nativedeps.NativeLib
-
-import com.snobot.simulator.plugin.SnobotSimulatorVersionsExtension
-import edu.wpi.first.gradlerio.wpi.WPIExtension
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @CompileStatic
@@ -81,27 +78,27 @@ public class SnobotSimCppSetupRule implements Plugin<Project> {
                     null
                 }
             }
-            
-            def wpilibExt = extensionContainer.getByType(WPIExtension)
-            def snobotSimExt = extensionContainer.getByType(SnobotSimulatorVersionsExtension)
 
-            createWpiLibrary('snobot_sim', "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', true)
-            createWpiLibrary('adx_family', "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', true)
-            createWpiLibrary('navx_simulator', "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', true)
-            
-            // Not done with GradleRIO
-            createWpiLibrary('halsim-adx_gyro_accelerometer', "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpilibExt.wpilibVersion}", 'halsim_adx_gyro_accelerometer', true)
-
-            libs.create('snobot_sim_cpp', CombinedNativeLib) { CombinedNativeLib clib ->
-                clib.libs <<
-                        "snobot_sim" <<
-                        "adx_family" <<
-                        "navx_simulator" <<
-                        "halsim-adx_gyro_accelerometer"
-
-                clib.targetPlatforms = ['desktop']
-                null
-            }
+            //            def wpilibExt = extensionContainer.getByType(WPIExtension)
+            //            def snobotSimExt = extensionContainer.getByType(SnobotSimulatorVersionsExtension)
+            //
+            //            createWpiLibrary('snobot_sim', "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', true)
+            //            createWpiLibrary('adx_family', "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', true)
+            //            createWpiLibrary('navx_simulator', "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', true)
+            //
+            //            // Not done with GradleRIO
+            //            createWpiLibrary('halsim-adx_gyro_accelerometer', "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpilibExt.wpilibVersion}", 'halsim_adx_gyro_accelerometer', true)
+            //
+            //            libs.create('snobot_sim_cpp', CombinedNativeLib) { CombinedNativeLib clib ->
+            //                clib.libs <<
+            //                        "snobot_sim" <<
+            //                        "adx_family" <<
+            //                        "navx_simulator" <<
+            //                        "halsim-adx_gyro_accelerometer"
+            //
+            //                clib.targetPlatforms = ['desktop']
+            //                null
+            //            }
         }
     }
 }

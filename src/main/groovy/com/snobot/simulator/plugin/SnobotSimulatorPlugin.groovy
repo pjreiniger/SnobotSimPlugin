@@ -19,7 +19,6 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     void apply(Project project) {
-        SnobotSimulatorVersionsExtension snobotSimExtension = project.extensions.create("snobotSim", SnobotSimulatorVersionsExtension, project)
 
         project.configurations.maybeCreate("snobotSimCompile")
         project.configurations.maybeCreate("snobotSimJavaNative")
