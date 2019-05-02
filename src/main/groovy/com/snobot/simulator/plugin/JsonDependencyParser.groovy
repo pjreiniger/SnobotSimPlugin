@@ -1,5 +1,6 @@
 package com.snobot.simulator.plugin;
 
+import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class JsonDependencyParser {
         mMavenRepos.put("Wpi", "http://first.wpi.edu/FRC/roborio/maven/release/")
     }
 
-    public void loadSnobotSimConfig(WPIDepsExtension wpiDeps) {
+    public void loadSnobotSimConfig(Project project, WPIDepsExtension wpiDeps) {
         File directory = wpiDeps.wpi.project.file("snobotsim/SnobotSim.json")
 
         if(directory.exists()) {
@@ -46,16 +47,6 @@ public class JsonDependencyParser {
                 try {
                     SnobotSimDependencyConfigs snobotSimConfig = parseJson(mSlurper.parse(it));
                     convertLibrariesToString(snobotSimConfig, wpiDeps.wpi.wpilibVersion, wpiDeps.vendor.getDependencies())
-
-                    System.out.println("Java Libraries")
-                    mJavaLibraries.each {
-                        System.out.println("  " + it)
-                    }
-
-                    System.out.println("JNI Libraries")
-                    mJniLibraries.each {
-                        System.out.println("  " + it)
-                    }
                 } catch (ex) {
                     LOGGER.error("Could not parse json file!", ex)
                 }
@@ -75,8 +66,6 @@ public class JsonDependencyParser {
         String output = input.replaceAll('\\$\\{version_number\\}', versionNumber)
         output = output.replaceAll('\\$\\{nativeclassifier\\}', nativeClassifier)
         output = output.replaceAll('\\$\\{wpilibVersion\\}', wpilibVersion)
-
-        System.out.println("Input '" + input + "' output '" + output + "'")
 
         return output;
     }

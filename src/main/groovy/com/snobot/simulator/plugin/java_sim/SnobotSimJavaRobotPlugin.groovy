@@ -1,6 +1,7 @@
 package com.snobot.simulator.plugin.java_sim;
 
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 import com.snobot.simulator.plugin.JsonDependencyParser
 import com.snobot.simulator.plugin.SnobotSimBasePlugin
@@ -18,10 +19,27 @@ public class SnobotSimJavaRobotPlugin extends SnobotSimBasePlugin {
         def wpilibExt = project.extensions.getByType(WPIExtension)
 
         JsonDependencyParser parser = new JsonDependencyParser();
-        parser.loadSnobotSimConfig(wpilibExt.deps);
+        parser.loadSnobotSimConfig(project, wpilibExt.deps);
 
         super.applyBase(project, parser.mMavenRepos);
         setupSnobotSimJavaDeps(project, parser.mJavaLibraries, parser.mJniLibraries)
+
+
+        project.task("snobotSimJavaVersions") { Task task ->
+            task.group = "SnobotSimulator"
+            task.description = "Print all versions of the snobotSim block"
+            task.doLast {
+                System.out.println("Java Libraries")
+                parser.mJavaLibraries.each {
+                    System.out.println("  " + it)
+                }
+
+                System.out.println("JNI Libraries")
+                parser.mJniLibraries.each {
+                    System.out.println("  " + it)
+                }
+            }
+        }
     }
 
     void setupSnobotSimJavaDeps(Project project, List<String> aJavaDependencies, List<String> aNativeDependencies) {
