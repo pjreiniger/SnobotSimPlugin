@@ -53,6 +53,7 @@ abstract class SnobotSimBasePlugin implements Plugin<Project> {
                 "com.snobot.simulator:snobot_sim_gui:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:snobot_sim_java:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:snobot_sim_utilities:${snobotSimExt.snobotSimVersion}",
+                "com.snobot.simulator:snobot_sim_joysticks:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}",
                 "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}",

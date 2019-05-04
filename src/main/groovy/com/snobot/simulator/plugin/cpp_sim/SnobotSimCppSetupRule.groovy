@@ -119,8 +119,6 @@ public class SnobotSimCppSetupRule extends RuleSource {
         for (boolean shared in [true, false]) {
             def suf = shared ? '' : '_static'
 
-            System.out.println("Adding libraryes...")
-
             createSnobotSimLibrary(libs, 'snobot_sim' + suf, "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', shared)
             createSnobotSimLibrary(libs, 'adx_family' + suf, "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', shared)
             createSnobotSimLibrary(libs, 'navx_simulator' + suf, "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', shared)
