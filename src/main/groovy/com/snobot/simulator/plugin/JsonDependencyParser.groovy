@@ -39,8 +39,6 @@ public class JsonDependencyParser {
         mCppJavaLibraries = new ArrayList<>();
 
         mMavenRepos = new HashMap<>();
-        mMavenRepos.put("SnobotSim", "http://raw.githubusercontent.com/pjreiniger/maven_repo/master/")
-        mMavenRepos.put("Wpi", "http://first.wpi.edu/FRC/roborio/maven/release/")
     }
 
     public void loadSnobotSimConfig(Project project, WPIDepsExtension wpiDeps) {
@@ -51,6 +49,13 @@ public class JsonDependencyParser {
                 try {
                     SnobotSimDependencyConfigs snobotSimConfig = parseJson(mSlurper.parse(it));
                     convertLibrariesToString(snobotSimConfig, wpiDeps.wpi.wpilibVersion, wpiDeps.vendor.getDependencies())
+                    if(snobotSimConfig.maven_repos == null) {
+                        LOGGER.error("No SnobotSim maven repositories in the config file, this ain't gonna work!")
+                    }
+                    else {
+                        mMavenRepos.putAll(snobotSimConfig.maven_repos);
+                        LOGGER.info("SnobotSim adding maven repos " + mMavenRepos)
+                    }
                 } catch (ex) {
                     LOGGER.error("Could not parse json file!", ex)
                 }
@@ -99,7 +104,7 @@ public class JsonDependencyParser {
         convertLibrariesToString(config.snobot_sim.libraries, config.snobot_sim.version_number, config.snobot_sim.version_number, wpilibVersion, nativeclassifier)
         //        convertLibrariesToString(config.third_party.libraries)
 
-        Map<String, SingleVendorVersionExtensionConfig> bestVendorProps = config.getBestVendorVersions(wpiVendors)
+        Map<String, SingleVendorVersionExtensionConfig> bestVendorProps = config.getBestVendorVersions(config.required_third_party, wpiVendors)
         bestVendorProps.values().each { SingleVendorVersionExtensionConfig vendorConfig ->
             convertLibrariesToString(vendorConfig.libraries, vendorConfig.version_number, config.snobot_sim.version_number, wpilibVersion, nativeclassifier)
         }
@@ -140,8 +145,10 @@ public class JsonDependencyParser {
         SnobotSimCoreDependencyConfigs snobot_sim;
         SnobotSim3rdPartyDependencyConfigs third_party;
         SnobotSimVendorProps vendor_props;
+        Map<String, String> maven_repos;
+        List<String> required_third_party;
 
-        public Map<String, SingleVendorVersionExtensionConfig> getBestVendorVersions(List<JsonDependency> wpiVendors) {
+        public Map<String, SingleVendorVersionExtensionConfig> getBestVendorVersions(List<String> requiredThirdParty, List<JsonDependency> wpiVendors) {
             Map<String, SingleVendorVersionExtensionConfig> output = new HashMap();
 
             wpiVendors.each { JsonDependency dep ->
@@ -159,11 +166,21 @@ public class JsonDependencyParser {
                         bestVersionKey = ourCollection.default_version
                     }
                     SingleVendorVersionExtensionConfig theVersion = ourCollection.versions.get(bestVersionKey)
-                    theVersion.version_number = bestVersionKey + "_" + theVersion.version_number
                     output.put(dep.name, theVersion)
                 }
                 else {
                     LOGGER.warn("Couldn't find SnobotSim vendor dep definition for " + dep.name)
+                }
+            }
+
+            for(String requiredLib : requiredThirdParty)
+            {
+                if(!output.containsKey(requiredLib))
+                {
+                    SingleVendorExtensionConfig ourCollection = vendor_props.vendors.get(requiredLib)
+                    SingleVendorVersionExtensionConfig theVersion = ourCollection.versions.get(ourCollection.default_version)
+                    LOGGER.info("SnobotSim requires the library '" + requiredLib + "' but you aren't using it, so it is using the default version of " + theVersion.version_number)
+                    output.put(requiredLib, theVersion)
                 }
             }
 

@@ -102,18 +102,24 @@ public class SnobotSimCppSetupRule extends RuleSource {
     }
 
     private static void addSnobotSimLibraries(NativeDepsSpec libs, final WPIExtension wpi) {
+        /*
         for (boolean shared in [true, false]) {
             def suf = shared ? '' : '_static'
 
-            String tmpVersion = "2019-0.0.1-RC"
-            createSnobotSimLibrary(libs, 'xXxXxX' + suf, "com.snobot.simulator:snobot_sim:${tmpVersion}", 'xXxXxX', shared)
+            createSnobotSimLibrary(libs, 'snobot_sim' + suf, "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', shared)
+            createSnobotSimLibrary(libs, 'adx_family' + suf, "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', shared)
+            createSnobotSimLibrary(libs, 'navx_simulator' + suf, "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', shared)
 
-            libs.create('snobotSimCpp' + suf, CombinedNativeLib, { CombinedNativeLib lib ->
-                lib.libs << 'xXxXxX' + suf
+            libs.create('snobot_sim_cpp' + suf, CombinedNativeLib, { CombinedNativeLib lib ->
+                lib.libs <<
+                        "snobot_sim" + suf <<
+                        "adx_family" + suf <<
+                        "navx_simulator" + suf
                 lib.buildTypes = ['debug', 'release']
                 lib.targetPlatforms = [wpi.platforms.desktop]
             } as Action<? extends CombinedNativeLib>)
         }
+        */
     }
 }
 
