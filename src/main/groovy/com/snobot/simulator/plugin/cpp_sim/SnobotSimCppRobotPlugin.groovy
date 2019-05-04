@@ -29,6 +29,7 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
                 "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
                 "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
                 "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:${nativeclassifier}",
+                "com.snobot.simulator:rev_simulator:${snobotSimExt.snobotSimRevVersion}:${nativeclassifier}",
                 // Not done with GradleRIO
                 "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
                 // CPP Specific
