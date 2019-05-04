@@ -5,6 +5,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory;
 
+import edu.wpi.first.gradlerio.wpi.WPIExtension
 import edu.wpi.first.gradlerio.wpi.dependencies.WPIDepsExtension
 import edu.wpi.first.gradlerio.wpi.dependencies.WPIVendorDepsExtension.JsonDependency
 import groovy.json.JsonSlurper
@@ -48,7 +49,7 @@ public class JsonDependencyParser {
             directory.withReader {
                 try {
                     SnobotSimDependencyConfigs snobotSimConfig = parseJson(mSlurper.parse(it));
-                    convertLibrariesToString(snobotSimConfig, wpiDeps.wpi.wpilibVersion, wpiDeps.vendor.getDependencies())
+                    convertLibrariesToString(snobotSimConfig, wpiDeps.wpi, wpiDeps.vendor.getDependencies())
                     if(snobotSimConfig.maven_repos == null) {
                         LOGGER.error("No SnobotSim maven repositories in the config file, this ain't gonna work!")
                     }
@@ -71,42 +72,43 @@ public class JsonDependencyParser {
         return new SnobotSimDependencyConfigs(jsonObject);
     }
 
-    private static String sanitizeDependency(String input, String versionNumber, String snobotSimVersion, String wpilibVersion, String nativeClassifier) {
+    private static String sanitizeDependency(String input, String versionNumber, String snobotSimVersion, WPIExtension wpiExtension, String nativeClassifier) {
         String output = input.replaceAll('\\$\\{version_number\\}', versionNumber)
         output = output.replaceAll('\\$\\{nativeclassifier\\}', nativeClassifier)
-        output = output.replaceAll('\\$\\{wpilibVersion\\}', wpilibVersion)
+        output = output.replaceAll('\\$\\{wpilibVersion\\}', wpiExtension.wpilibVersion)
+        output = output.replaceAll('\\$\\{wpiOpenCvVersion\\}', wpiExtension.opencvVersion)
 
         return output;
     }
 
-    private void convertLibrariesToString(LibraryTuple configs, String versionNumber, String snobotSimVersion, String wpilibVersion, String nativeClassifier) {
+    private void convertLibrariesToString(LibraryTuple configs, String versionNumber, String snobotSimVersion, WPIExtension wpiExtension, String nativeClassifier) {
         configs.java.each { String dep ->
-            mJavaLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
+            mJavaLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpiExtension, nativeClassifier))
         }
         configs.jni.each { String dep ->
-            mJniLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
+            mJniLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpiExtension, nativeClassifier))
         }
         if(configs.cpp != null) {
             configs.cpp.each { String dep ->
-                mCppLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
+                mCppLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpiExtension, nativeClassifier))
             }
         }
         if(configs.cpp_java != null) {
             configs.cpp_java.each { String dep ->
-                mCppJavaLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpilibVersion, nativeClassifier))
+                mCppJavaLibraries.add(sanitizeDependency(dep, versionNumber, snobotSimVersion, wpiExtension, nativeClassifier))
             }
         }
     }
 
-    private void convertLibrariesToString(SnobotSimDependencyConfigs config, String wpilibVersion, List<JsonDependency> wpiVendors) {
+    private void convertLibrariesToString(SnobotSimDependencyConfigs config, WPIExtension wpiExtension, List<JsonDependency> wpiVendors) {
 
-        convertLibrariesToString(config.third_party.libraries, "", "", "", "")
-        convertLibrariesToString(config.snobot_sim.libraries, config.snobot_sim.version_number, config.snobot_sim.version_number, wpilibVersion, nativeclassifier)
+        convertLibrariesToString(config.third_party.libraries, "", "", wpiExtension, "")
+        convertLibrariesToString(config.snobot_sim.libraries, config.snobot_sim.version_number, config.snobot_sim.version_number, wpiExtension, nativeclassifier)
         //        convertLibrariesToString(config.third_party.libraries)
 
         Map<String, SingleVendorVersionExtensionConfig> bestVendorProps = config.getBestVendorVersions(config.required_third_party, wpiVendors)
         bestVendorProps.values().each { SingleVendorVersionExtensionConfig vendorConfig ->
-            convertLibrariesToString(vendorConfig.libraries, vendorConfig.version_number, config.snobot_sim.version_number, wpilibVersion, nativeclassifier)
+            convertLibrariesToString(vendorConfig.libraries, vendorConfig.version_number, config.snobot_sim.version_number, wpiExtension, nativeclassifier)
         }
     }
 

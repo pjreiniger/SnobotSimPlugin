@@ -7,6 +7,8 @@ import org.gradle.model.RuleSource
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.snobot.simulator.plugin.JsonDependencyParser
+
 import edu.wpi.first.gradlerio.wpi.WPIExtension
 import edu.wpi.first.toolchain.NativePlatforms
 import groovy.transform.CompileStatic
@@ -102,24 +104,27 @@ public class SnobotSimCppSetupRule extends RuleSource {
     }
 
     private static void addSnobotSimLibraries(NativeDepsSpec libs, final WPIExtension wpi) {
-        /*
+
+        JsonDependencyParser depParser = new JsonDependencyParser();
+        depParser.loadSnobotSimConfig(wpi.project, wpi.deps)
+
         for (boolean shared in [true, false]) {
             def suf = shared ? '' : '_static'
 
-            createSnobotSimLibrary(libs, 'snobot_sim' + suf, "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}", 'snobot_sim', shared)
-            createSnobotSimLibrary(libs, 'adx_family' + suf, "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}", 'adx_family', shared)
-            createSnobotSimLibrary(libs, 'navx_simulator' + suf, "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}", 'navx_simulator', shared)
+            def libraries = []
+            depParser.mCppLibraries.eachWithIndex { String depString, i ->
+                String depName = "dep" + i
+                createSnobotSimLibrary(libs, depName + suf, depString, depName, shared)
+                libraries << depName + suf
+            }
+
 
             libs.create('snobot_sim_cpp' + suf, CombinedNativeLib, { CombinedNativeLib lib ->
-                lib.libs <<
-                        "snobot_sim" + suf <<
-                        "adx_family" + suf <<
-                        "navx_simulator" + suf
+                lib.libs = libraries
                 lib.buildTypes = ['debug', 'release']
                 lib.targetPlatforms = [wpi.platforms.desktop]
             } as Action<? extends CombinedNativeLib>)
         }
-        */
     }
 }
 

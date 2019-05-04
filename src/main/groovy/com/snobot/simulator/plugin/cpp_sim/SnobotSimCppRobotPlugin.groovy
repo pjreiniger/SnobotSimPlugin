@@ -21,7 +21,7 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         parser.loadSnobotSimConfig(project, wpilibExt.deps);
 
         super.applyBase(project, parser.mMavenRepos);
-        setupSnobotSimCppDeps(project, parser.mCppLibraries, parser.mCppJavaLibraries, parser.mJavaLibraries)
+        setupSnobotSimCppDeps(project, parser.mCppLibraries, parser.mCppJavaLibraries, parser.mJavaLibraries, parser.mJniLibraries)
 
 
         project.task("snobotSimCppVersions") { Task task ->
@@ -41,16 +41,18 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
         }
     }
 
-    void setupSnobotSimCppDeps(Project project, List<String> aCppDependencies, List<String> aCppJavaDependencies, List<String> aJavaDependencies) {
+    void setupSnobotSimCppDeps(Project project, List<String> aCppDependencies, List<String> aCppJavaDependencies, List<String> aJavaDependencies, List<String> aJniDependencies) {
 
-        project.dependencies.ext.snobotSimCppNative = { aCppDependencies }
+        project.dependencies.ext.snobotSimCppNative = {
+            def output = new ArrayList<>(aCppDependencies)
+            output.addAll(aJniDependencies)
+
+            output
+        }
 
         project.dependencies.ext.snobotSimCpp = {
             def output = new ArrayList<>(aJavaDependencies)
             output.addAll(aCppJavaDependencies)
-
-            System.out.println("JAVA: " + aJavaDependencies)
-            System.out.println("JC  : " + aCppJavaDependencies)
 
             project.dependencies.ext.snobotSimCppNative().each {
                 project.dependencies.add("snobotSimCppNative", it)
