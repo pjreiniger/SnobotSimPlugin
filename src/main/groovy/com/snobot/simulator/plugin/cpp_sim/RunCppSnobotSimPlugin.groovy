@@ -19,6 +19,10 @@ class RunCppSnobotSimPlugin implements Plugin<Project> {
 
         File wrapperExtractDir = new File(project.getBuildDir(), "tmp/SnobotSimWrapper");
 
+        project.tasks.register("extractSnobotSimCppJNI", ExtractSnobotSimCppNatives) { ExtractSnobotSimCppNatives t ->
+            t.group = "SnobotSimulator"
+        }
+
         project.tasks.create("copyWrapperLibrary", Copy) { Task task ->
             destinationDir = new File(project.buildDir, "/tmp/snobotSimCppNative")
 
@@ -95,6 +99,7 @@ JNIEXPORT void JNICALL Java_RobotSimulatorJni_startCompetition
                 project.tasks.create("runCppSnobotSim") { Task task ->
                     task.group = "SnobotSimulator"
                     task.description ="Runs the simulator with SnobotSim"
+                    task.dependsOn "extractSnobotSimCppJNI"
                     task.dependsOn jarTask
 
                     if(project.tasks.findByName("snobotSimCppWrapperReleaseSharedLibrary")) {

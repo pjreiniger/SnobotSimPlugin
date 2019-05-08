@@ -1,9 +1,10 @@
 package com.snobot.simulator.plugin.cpp_sim;
 
 import org.gradle.api.Project
+import org.gradle.api.Task
 
+import com.snobot.simulator.plugin.JsonDependencyParser
 import com.snobot.simulator.plugin.SnobotSimBasePlugin
-import com.snobot.simulator.plugin.SnobotSimulatorVersionsExtension
 
 import edu.wpi.first.gradlerio.wpi.WPIExtension
 
@@ -15,50 +16,47 @@ public class SnobotSimCppRobotPlugin extends SnobotSimBasePlugin {
 
     void apply(Project project) {
         def wpilibExt = project.extensions.getByType(WPIExtension)
-        def snobotSimExt = project.extensions.getByType(SnobotSimulatorVersionsExtension)
 
-        setupSnobotSimCppDeps(project, snobotSimExt, wpilibExt)
-        super.applyBase(project)
+        JsonDependencyParser parser = new JsonDependencyParser();
+        parser.loadSnobotSimConfig(project, wpilibExt.deps);
+
+        super.applyBase(project, parser.mMavenRepos);
+        setupSnobotSimCppDeps(project, parser.mCppLibraries, parser.mCppJavaLibraries, parser.mJavaLibraries, parser.mJniLibraries)
+
+
+        project.task("snobotSimCppVersions") { Task task ->
+            task.group = "SnobotSimulator"
+            task.description = "Print all versions of the snobotSim block"
+            task.doLast {
+                System.out.println("C++ Libraries")
+                parser.mCppLibraries.each {
+                    System.out.println("  " + it)
+                }
+
+                System.out.println("C++ Java Libraries (needed for GUI sim)")
+                parser.mCppJavaLibraries.each {
+                    System.out.println("  " + it)
+                }
+            }
+        }
     }
 
-    void setupSnobotSimCppDeps(Project project, SnobotSimulatorVersionsExtension snobotSimExt, WPIExtension wpiExt) {
+    void setupSnobotSimCppDeps(Project project, List<String> aCppDependencies, List<String> aCppJavaDependencies, List<String> aJavaDependencies, List<String> aJniDependencies) {
 
         project.dependencies.ext.snobotSimCppNative = {
-            def output = [
-                "net.java.jinput:jinput:${snobotSimExt.jinput}",
-                "com.snobot.simulator:adx_family:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
-                "com.snobot.simulator:navx_simulator:${snobotSimExt.snobotSimVersion}:${nativeclassifier}",
-                "com.snobot.simulator:ctre_sim_override:${snobotSimExt.snobotSimCtreVersion}:${nativeclassifier}",
-                // Not done with GradleRIO
-                "edu.wpi.first.halsim:halsim_adx_gyro_accelerometer:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                // CPP Specific
-                "edu.wpi.first.wpilibc:wpilibc-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.ntcore:ntcore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.cscore:cscore-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.wpiutil:wpiutil-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.hal:hal-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.cameraserver:cameraserver-cpp:${wpiExt.wpilibVersion}:${nativeclassifier}@zip",
-                "edu.wpi.first.thirdparty.frc2019.opencv:opencv-cpp:${wpiExt.opencvVersion}:${nativeclassifier}@zip",
-                "com.snobot.simulator:snobot_sim:${snobotSimExt.snobotSimVersion}:${nativeclassifier}@zip"
-            ]
+            def output = new ArrayList<>(aCppDependencies)
+            output.addAll(aJniDependencies)
 
             output
         }
 
         project.dependencies.ext.snobotSimCpp = {
-            def output = [
-                "edu.wpi.first.wpilibj:wpilibj-java:${wpiExt.wpilibVersion}",
-                "edu.wpi.first.ntcore:ntcore-java:${wpiExt.wpilibVersion}",
-                "edu.wpi.first.cscore:cscore-java:${wpiExt.wpilibVersion}",
-                "edu.wpi.first.wpiutil:wpiutil-java:${wpiExt.wpilibVersion}",
-                "edu.wpi.first.hal:hal-java:${wpiExt.wpilibVersion}",
-                "edu.wpi.first.cameraserver:cameraserver-java:${wpiExt.wpilibVersion}",
-            ]
+            def output = new ArrayList<>(aJavaDependencies)
+            output.addAll(aCppJavaDependencies)
+
             project.dependencies.ext.snobotSimCppNative().each {
                 project.dependencies.add("snobotSimCppNative", it)
             }
-
-            project.dependencies.ext.snobotSimBase().each { output << it }
 
             output
         }
