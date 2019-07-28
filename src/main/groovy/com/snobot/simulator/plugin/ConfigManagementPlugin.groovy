@@ -32,7 +32,7 @@ class ConfigManagementPlugin implements Plugin<Project> {
                 newText = new URL(remote_url).getText()
             }
 
-            File outputFile = new File("output.json")
+            File outputFile = new File("snobotsim/SnobotSim.json")
             outputFile.delete();
             outputFile << newText
         }
