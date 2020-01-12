@@ -28,8 +28,19 @@ class ConfigManagementPlugin implements Plugin<Project> {
             else {
                 LOGGER.info("Using remote file");
 
-                def remote_url = "https://raw.githubusercontent.com/pjreiniger/maven_repo/master/com/snobot/simulator/SimulatorConfig.json"
+                def remote_url;
+
+                if(project.hasProperty("test_remote_url")) {
+                    LOGGER.info("Using a custom remote url: '" + project.test_remote_url + "'");
+                    remote_url = project.test_remote_url
+                }
+                else {
+                    remote_url = "https://raw.githubusercontent.com/snobotsim/maven_repo/master/release/"
+                }
+                remote_url += "com/snobot/simulator/SimulatorConfig.json"
+                LOGGER.info("Using file '" + remote_url + "'");
                 newText = new URL(remote_url).getText()
+                LOGGER.info(newText);
             }
 
             File outputFile = new File("snobotsim/SnobotSim.json")
