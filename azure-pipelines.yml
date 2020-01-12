@@ -21,5 +21,5 @@ steps:
     gradleOptions: '-Xmx3072m'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'build publishToMavenLocal PatchExamples'
+    tasks: 'build publishToMavenLocal'
     options: '--stacktrace -PlocalPublish'

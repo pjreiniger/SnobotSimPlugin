@@ -23,6 +23,8 @@ class SnobotSimulatorPlugin implements Plugin<Project> {
         project.configurations.maybeCreate("snobotSimJavaNative")
         project.configurations.maybeCreate("snobotSimCppNative")
 
+        project.pluginManager.apply(ConfigManagementPlugin)
+
         project.pluginManager.apply(RunJavaSnobotSimPlugin)
         project.pluginManager.apply(RunCppSnobotSimPlugin)
 
