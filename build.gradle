@@ -47,7 +47,7 @@ publishing {
 
 
 group = "com.snobot.simulator.plugin"
-version = "2020-0.0.0"
+version = "2020-0.0.2"
 
 pluginBundle {
     website = 'https://github.com/pjreiniger/SnobotSimPlugin'
@@ -59,6 +59,16 @@ pluginBundle {
         gradleRio {
             id = "${project.group}.${project.archivesBaseName}"
             displayName = 'Snobot Simulator Plugin'
+        }
+    }
+}
+
+gradlePlugin {
+    plugins {
+        SnobotSimulatorPlugin {
+            id = "${project.group}.${project.archivesBaseName}"
+            displayName = 'Snobot Simulator Plugin'
+            implementationClass = 'com.snobot.simulator.plugin SnobotSimulatorPlugin'
         }
     }
 }

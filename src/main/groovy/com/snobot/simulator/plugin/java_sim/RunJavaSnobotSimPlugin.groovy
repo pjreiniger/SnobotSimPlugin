@@ -69,6 +69,8 @@ class RunJavaSnobotSimPlugin implements Plugin<Project> {
                         List<String> args = new ArrayList<>();
                         args.add(OperatingSystem.current().isWindows() ? "java" : Jvm.current().getExecutable("java").absolutePath)
                         args.add("-Djava.library.path=${ldpath}")
+                        args.add("-Xdebug")
+                        args.add("-Xrunjdwp:transport=dt_shmem,address=snobotSim,server=y,suspend=n")
                         args.add("-classpath")
                         args.add(classpath)
                         args.add("com.snobot.simulator.Main")
